@@ -5,8 +5,6 @@ import os
 
 from quart import Blueprint, request, render_template
 
-from website.api.channels.util import create_channel
-
 views = Blueprint("views", __name__)
 
 
@@ -26,22 +24,3 @@ async def send_code():
     else:
         return await render_template("base.html")
 
-
-@views.route("/create_channel", methods=["GET", "POST"])
-async def _create_channel(access_token: str):
-    if request.method == "POST":
-        form = await request.form
-        channel_id = form.get("channel_id")
-        provider_type = form.get("provider_type", "other")
-        channel_name = form.get("channel_name")
-
-        success = await create_channel(
-            access_token, channel_id, channel_name, provider_type
-        )
-
-        if success:
-            return await render_template("success.html")
-        else:
-            return await render_template("error.html")
-
-    return await render_template("create_channel.html")
