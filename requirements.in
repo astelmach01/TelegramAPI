@@ -2,12 +2,16 @@ pyrogram
 tgcrypto
 quart
 
+boto3
+aws-secretsmanager-caching
+pymysql
+
 aiohttp
 hypercorn
 
-pymysql
 
 cryptg
 requests
 pytest
+pydantic
 python-dotenv

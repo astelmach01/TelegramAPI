@@ -1,11 +1,12 @@
 """
 Routes
 """
-import os
+import logging
 
-from pyrogram.handlers import MessageHandler
-from quart import Blueprint, request, render_template, jsonify
 from pyrogram import Client
+from pyrogram.handlers import MessageHandler
+from quart import Blueprint, request, jsonify
+from .util import run_query, SQLQueryRunner, get_db
 
 views = Blueprint("views", __name__)
 
@@ -15,7 +16,7 @@ async def new_message(client, message):
     sender_id = str(message.from_user.id)
     time = message.date
 
-    print("Got a message", msg, sender_id, time)
+    logging.info("Got a message", msg, sender_id, time)
 
     await send_message_to_PD(
         access_token,
@@ -35,7 +36,11 @@ async def create():
     pipedrive_client_id = payload.get("pipedrive_client_id")
     pipedrive_client_secret = payload.get("pipedrive_client_secret")
 
-    # TODO: store this info in a database
+    # store this info in a database
+    with SQLQueryRunner(get_db()) as cursor:
+        sql = run_query("insert_telegram_credentials", phone_number=phone_number, telegram_api_id=telegram_api_id, telegram_api_hash=telegram_api_hash, pipedrive_client_id=pipedrive_client_id, pipedrive_client_secret=pipedrive_client_secret)
+        cursor.execute(sql)
+    
 
     # create the client to send the code
     client = Client(phone_number, api_id=telegram_api_id, api_hash=telegram_api_hash)

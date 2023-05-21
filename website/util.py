@@ -1,16 +1,18 @@
+import logging
 import os
-from jinja2 import Environment, FileSystemLoader
+
 import pymysql
-from dotenv import load_dotenv
+import pymysql.cursors
+from jinja2 import Environment, FileSystemLoader
 
-load_dotenv()
+from website.settings import settings
 
-queries_dir = os.path.join(os.getcwd(), 'website', "queries")
-print(queries_dir)
+queries_dir = os.path.join(os.getcwd(), 'website', 'queries')
 
 # Set up the Jinja environment to load templates from the "/queries" directory
 jinja_env = Environment(loader=FileSystemLoader(queries_dir), autoescape=True)
 
+db = None
 
 def run_query(file_name: str, **kwargs):
     return jinja_env.get_template(file_name).render(kwargs)
@@ -27,33 +29,41 @@ class SQLQueryRunner:
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:
             # Handle any exceptions raised within the context
-            print(f"An error occurred: {exc_type} - {exc_val}")
+            logging.error(f"An error occurred: {exc_type} - {exc_val}")
         self.cursor.close()
 
 
-def connect_to_db():
+def get_db():
+    
+    global db
+    if db is not None:
+        return db
+    
     # Read environment variables
-    db_username = os.environ.get('DB_USERNAME')
-    db_password = os.environ.get('DB_PASSWORD')
-    db_endpoint = os.environ.get('DB_ENDPOINT')
-    db_port = os.environ.get('DB_PORT')
+    db_username = settings.db_username
+    db_password = settings.db_password
+    db_endpoint = settings.db_endpoint
+    db_port = settings.db_port
 
     try:
-        # Establish a connection to the MySQL database
         conn = pymysql.connect(
             host=db_endpoint,
-            port=int(db_port),
+            port=db_port,
             user=db_username,
             password=db_password,
             database='BASE',
             charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor
+            cursorclass=pymysql.cursors.DictCursor,
+            autocommit=True
         )
 
+        logging.info("Connected to the database")
+        
+        db = conn
+        
         # Return the connection object
         return conn
 
     except pymysql.MySQLError as e:
-        print("Error connecting to MySQL database:", str(e))
+        logging.error("Error connecting to MySQL database: %s", str(e))
         return None
-
