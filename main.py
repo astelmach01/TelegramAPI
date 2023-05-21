@@ -1,3 +1,4 @@
+import asyncio
 import os
 import hypercorn
 from quart import Config
@@ -15,5 +16,4 @@ async def start():
 
 
 if __name__ == "__main__":
-    debug = settings.ENVIRONMENT == "development"
-    app.run(debug=False)
+    asyncio.run(start())
