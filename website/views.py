@@ -77,9 +77,10 @@ async def verify():
         result = pd.DataFrame(cursor.fetchall()).iloc[0]
 
     phone_code_hash = result['phone_code_hash']
+    pipedrive_client_id = result['pipedrive_client_id']
 
     client = await storage.get_client(phone_number)
     client.add_handler(MessageHandler(new_message))
     await client.sign_in(phone_number=phone_number, phone_code_hash=phone_code_hash, phone_code=auth_code)
 
-    return jsonify({"message": "Successfully signed in to " + phone_number})
+    return jsonify({"pipedrive_client_id": pipedrive_client_id})
