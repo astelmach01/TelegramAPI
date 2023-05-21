@@ -52,6 +52,7 @@ class Settings(BaseSettings):
     TELEGRAM_API_ID: str
     TELEGRAM_API_HASH: str
     ENVIRONMENT: str
+    PORT: int
 
     class Config:
         env_file = ".env"
