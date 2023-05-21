@@ -81,4 +81,5 @@ async def verify():
     client = await storage.get_client(phone_number)
     client.add_handler(MessageHandler(new_message))
     await client.sign_in(phone_number=phone_number, phone_code_hash=phone_code_hash, phone_code=auth_code)
-    logging.info("Successfully signed in to " + phone_number)
+
+    return jsonify({"message": "Successfully signed in to " + phone_number})
