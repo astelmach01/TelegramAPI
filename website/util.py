@@ -26,6 +26,7 @@ jinja_env = Environment(loader=FileSystemLoader(queries_dir), autoescape=True)
 
 db = None
 
+
 def run_query(file_name: str, **kwargs):
     return jinja_env.get_template(file_name).render(kwargs)
 
@@ -46,11 +47,10 @@ class SQLQueryRunner:
 
 
 def get_db():
-    
     global db
     if db is not None:
         return db
-    
+
     # Read environment variables
     db_username = settings.db_username
     db_password = settings.db_password
@@ -70,9 +70,9 @@ def get_db():
         )
 
         logging.info("Connected to the database")
-        
+
         db = conn
-        
+
         # Return the connection object
         return conn
 

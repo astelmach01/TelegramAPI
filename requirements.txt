@@ -80,8 +80,12 @@ multidict==6.0.4
     # via
     #   aiohttp
     #   yarl
+numpy==1.24.3
+    # via pandas
 packaging==23.1
     # via pytest
+pandas==2.0.1
+    # via -r requirements.in
 pluggy==1.0.0
     # via pytest
 priority==2.0.0
@@ -99,9 +103,13 @@ pysocks==1.7.1
 pytest==7.3.1
     # via -r requirements.in
 python-dateutil==2.8.2
-    # via botocore
+    # via
+    #   botocore
+    #   pandas
 python-dotenv==1.0.0
     # via -r requirements.in
+pytz==2023.3
+    # via pandas
 quart==0.18.4
     # via -r requirements.in
 requests==2.30.0
@@ -116,6 +124,8 @@ toml==0.10.2
     # via hypercorn
 typing-extensions==4.5.0
     # via pydantic
+tzdata==2023.3
+    # via pandas
 urllib3==1.26.15
     # via
     #   botocore

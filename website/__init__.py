@@ -1,3 +1,4 @@
+import logging
 import os
 
 from quart import Quart
@@ -27,11 +28,15 @@ def create_app():
 
 
 def create_database():
+    
+    logging.info("Creating session table")
 
     with SQLQueryRunner(conn) as cursor:
         sql = run_query("create_session_table")
         cursor.execute(sql)
         
+    logging .info("Creating client credentials table")
+    
     with SQLQueryRunner(conn) as cursor:
         sql = run_query("create_client_credentials_table")
         cursor.execute(sql)

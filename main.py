@@ -1,11 +1,14 @@
 import asyncio
 import os
+
 import hypercorn
 from hypercorn.config import Config
+import hypercorn.asyncio
+
 from website import create_app
-from website.settings import settings
 
 app = create_app()
+
 
 async def start():
     config = Config()
