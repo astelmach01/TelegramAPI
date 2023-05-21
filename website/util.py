@@ -1,11 +1,23 @@
 import logging
 import os
+from dotenv import load_dotenv
 
 import pymysql
 import pymysql.cursors
 from jinja2 import Environment, FileSystemLoader
 
 from website.settings import settings
+
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
 
 queries_dir = os.path.join(os.getcwd(), 'website', 'queries')
 

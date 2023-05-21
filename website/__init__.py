@@ -1,20 +1,8 @@
-import logging
 import os
 
-from dotenv import load_dotenv
 from quart import Quart
 from .util import run_query, SQLQueryRunner, get_db
 
-load_dotenv()
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
 
 conn = get_db()
 
