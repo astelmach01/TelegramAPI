@@ -1,7 +1,7 @@
 import asyncio
 import os
 import hypercorn
-from quart import Config
+from hypercorn.config import Config
 from website import create_app
 from website.settings import settings
 
