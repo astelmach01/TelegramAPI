@@ -43,3 +43,7 @@ def create_database():
     with SQLQueryRunner(conn) as cursor:
         sql = run_query("create_session_table")
         cursor.execute(sql)
+        
+    with SQLQueryRunner(conn) as cursor:
+        sql = run_query("create_client_credentials_table")
+        cursor.execute(sql)
