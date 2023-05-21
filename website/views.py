@@ -70,6 +70,7 @@ async def verify():
     auth_code = payload.get("auth_code")
 
     with SQLQueryRunner(get_db()) as cursor:
+        logging.info("Selecting phone number")
         sql = run_query('select_phone_number', phone_number=phone_number)
         cursor.execute(sql)
 
