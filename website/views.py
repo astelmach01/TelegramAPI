@@ -52,7 +52,7 @@ async def create():
     # store this info in a database
     with SQLQueryRunner(get_db()) as cursor:
         logging.info("Inserting credentials into database")
-        sql = run_query("insert_telegram_credentials", phone_number=phone_number, phone_code_hash=phone_code_hash,
+        sql = run_query("insert_telegram_credentials.sql", phone_number=phone_number, phone_code_hash=phone_code_hash,
                         telegram_api_id=telegram_api_id, telegram_api_hash=telegram_api_hash,
                         pipedrive_client_id=pipedrive_client_id, pipedrive_client_secret=pipedrive_client_secret)
         cursor.execute(sql)
@@ -71,7 +71,7 @@ async def verify():
 
     with SQLQueryRunner(get_db()) as cursor:
         logging.info("Selecting phone number")
-        sql = run_query('select_phone_number', phone_number=phone_number)
+        sql = run_query('select_phone_number.sql', phone_number=phone_number)
         cursor.execute(sql)
 
         result = pd.DataFrame(cursor.fetchall()).iloc[0]
@@ -82,5 +82,3 @@ async def verify():
     client.add_handler(MessageHandler(new_message))
     await client.sign_in(phone_number=phone_number, phone_code_hash=phone_code_hash, phone_code=auth_code)
     logging.info("Successfully signed in to " + phone_number)
-    await client.start()
-    logging.info("Started client " + phone_number)
