@@ -38,6 +38,7 @@ async def create():
 
     # store this info in a database
     with SQLQueryRunner(get_db()) as cursor:
+        logging.info("Inserting credentials into database")
         sql = run_query("insert_telegram_credentials", phone_number=phone_number, telegram_api_id=telegram_api_id, telegram_api_hash=telegram_api_hash, pipedrive_client_id=pipedrive_client_id, pipedrive_client_secret=pipedrive_client_secret)
         cursor.execute(sql)
     
