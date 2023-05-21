@@ -1,8 +1,9 @@
-from website import create_app
+from website import create_app, settings
 
 app = create_app()
 
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    debug = settings.ENVIRONMENT == "development"
+    app.run(debug=debug)
