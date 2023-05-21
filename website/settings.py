@@ -23,7 +23,7 @@ AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
-    session = boto3.session.Session()
+    logging.info("AWS credentials not found.")
     
 else:
     # Create a Secrets Manager client
