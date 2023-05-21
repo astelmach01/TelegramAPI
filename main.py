@@ -1,3 +1,4 @@
+import os
 import hypercorn
 from quart import Config
 from website import create_app
@@ -7,7 +8,7 @@ app = create_app()
 
 async def start():
     config = Config()
-    port = settings.PORT
+    port = os.getenv("PORT", 5000)
     config.bind = [f"0.0.0.0:{port}"]
 
     await hypercorn.asyncio.serve(app, config)
