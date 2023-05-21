@@ -1,10 +1,12 @@
 pyrogram
 tgcrypto
 quart
+
 aiohttp
 hypercorn
 
-telethon
+pymysql
+
 cryptg
 requests
 pytest
