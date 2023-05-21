@@ -47,5 +47,9 @@ async def create():
     client = Client(phone_number, api_id=telegram_api_id, api_hash=telegram_api_hash)
     client.add_handler(MessageHandler(new_message))
     await client.connect()
+    
+    logging.info("Client connected")
+    
+    result = await jsonify({"message": "Payload received successfully"})
 
-    return jsonify({"message": "Payload received successfully"})
+    return result
