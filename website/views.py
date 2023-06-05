@@ -57,7 +57,7 @@ async def send_code_1():
         )
         cursor.execute(sql)
 
-    client = Client(phone_number, telegram_api_id, telegram_api_hash)
+    client = Client(phone_number + "-on-message", telegram_api_id, telegram_api_hash)
     await client.connect()
     
     await storage.put_on_message_client(phone_number, client)
@@ -98,7 +98,7 @@ async def send_code_2():
     telegram_api_id = result["telegram_api_id"]
     telegram_api_hash = result["telegram_api_hash"]
     
-    client = Client(phone_number, telegram_api_id, telegram_api_hash)
+    client = Client(phone_number + "-send-message", telegram_api_id, telegram_api_hash)
     await client.connect()
     
     await storage.put_send_message_client(phone_number, client)
