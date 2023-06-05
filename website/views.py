@@ -60,7 +60,7 @@ async def send_code_1():
     client = Client(phone_number, telegram_api_id, telegram_api_hash)
     await client.connect()
     
-    storage.put_on_message_client(phone_number, client)
+    await storage.put_on_message_client(phone_number, client)
 
     try:
         sent_code = await client.send_code(phone_number)
@@ -101,7 +101,7 @@ async def send_code_2():
     client = Client(phone_number, telegram_api_id, telegram_api_hash)
     await client.connect()
     
-    storage.put_send_message_client(phone_number, client)
+    await storage.put_send_message_client(phone_number, client)
 
     try:
         sent_code = await client.send_code(phone_number)
@@ -162,7 +162,7 @@ async def create_string_2():
 
     pipedrive_client_id = result["pipedrive_client_id"]
 
-    client = storage.get_send_message_client(phone_number)
+    client = await storage.get_send_message_client(phone_number)
     await client.sign_in(phone_number, phone_code_hash, auth_code)
     
     session_string = await client.export_session_string()
