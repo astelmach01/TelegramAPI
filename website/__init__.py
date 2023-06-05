@@ -31,11 +31,17 @@ def create_database():
     logging.info("Creating session table")
 
     with SQLQueryRunner(conn) as cursor:
+        sql = "DROP TABLE IF EXISTS sessions;"
+        cursor.execute(sql)
+        
         sql = run_query("create_session_table.sql")
         cursor.execute(sql)
 
     logging.info("Creating client credentials table")
 
     with SQLQueryRunner(conn) as cursor:
+        sql = "DROP TABLE IF EXISTS telegram_credentials;"
+        cursor.execute(sql)
+        
         sql = run_query("create_client_credentials_table.sql")
         cursor.execute(sql)
