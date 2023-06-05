@@ -8,7 +8,6 @@ from pyrogram.handlers import MessageHandler
 from quart import Blueprint, request, jsonify
 import pandas as pd
 from .util import run_query, SQLQueryRunner, get_db
-from .core import storage
 
 views = Blueprint("views", __name__)
 
