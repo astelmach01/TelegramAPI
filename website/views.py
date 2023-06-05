@@ -37,7 +37,6 @@ async def send_code(phone_number: str, telegram_api_id: str, telegram_api_hash: 
 
         phone_code_hash = sent_code.phone_code_hash
 
-        await client.disconnect()
         return {
             "success": True,
             "phone_code_hash": phone_code_hash,
@@ -46,7 +45,6 @@ async def send_code(phone_number: str, telegram_api_id: str, telegram_api_hash: 
 
     except Exception as e:
         logging.error("Error sending code: " + str(e))
-        await client.disconnect()
         raise e
 
 
