@@ -5,7 +5,7 @@ import logging
 
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
-from quart import Blueprint, request, jsonify
+from quart import Blueprint, request, jsonify, session
 import pandas as pd
 from .util import run_query, SQLQueryRunner, get_db
 
@@ -38,13 +38,12 @@ async def send_code(phone_number: str, telegram_api_id: str, telegram_api_hash: 
         phone_code_hash = sent_code.phone_code_hash
 
         await client.disconnect()
-        return jsonify(
-            {
-                "success": True,
-                "phone_code_hash": phone_code_hash,
-                "phone_number": phone_number,
-            }
-        )
+        return {
+            "success": True,
+            "phone_code_hash": phone_code_hash,
+            "phone_number": phone_number,
+        }
+
     except Exception as e:
         logging.error("Error sending code: " + str(e))
         await client.disconnect()
@@ -74,13 +73,12 @@ async def get_session_string(
         await client.disconnect()
         raise e
 
-    return jsonify(
-        {
+    return {
             "success": True,
             "session_string": session_string,
             "phone_number": phone_number,
         }
-    )
+    
 
 
 @views.route("/send_code_1", methods=["POST"])
@@ -107,13 +105,15 @@ async def send_code_1():
         cursor.execute(sql)
 
     try:
-        phone_code_hash = await send_code(
+        response = await send_code(
             phone_number, telegram_api_id, telegram_api_hash
         )
     except Exception as e:
         logging.error("Error sending code: " + str(e))
         return jsonify({"success": False, "error": str(e)})
 
+    phone_code_hash = response["phone_code_hash"]
+    
     return jsonify(
         {
             "success": True,
@@ -174,13 +174,15 @@ async def create_string_1():
     telegram_api_id = result["telegram_api_id"]
     telegram_api_hash = result["telegram_api_hash"]
 
-    session_string = await get_session_string(
+    response = await get_session_string(
         phone_number,
         telegram_api_id,
         telegram_api_hash,
         phone_code_hash,
         auth_code,
     )
+    
+    session_string = response["session_string"]
 
     with SQLQueryRunner() as cursor:
         logging.info("Inserting session string into database")

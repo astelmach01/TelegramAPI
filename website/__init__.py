@@ -33,7 +33,7 @@ def create_database():
     with SQLQueryRunner(conn) as cursor:
         sql = "DROP TABLE IF EXISTS sessions;"
         cursor.execute(sql)
-        
+
         sql = run_query("create_session_table.sql")
         cursor.execute(sql)
 
@@ -42,6 +42,6 @@ def create_database():
     with SQLQueryRunner(conn) as cursor:
         sql = "DROP TABLE IF EXISTS telegram_credentials;"
         cursor.execute(sql)
-        
+
         sql = run_query("create_client_credentials_table.sql")
         cursor.execute(sql)
