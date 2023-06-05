@@ -28,8 +28,57 @@ async def new_message(client, message):
     )
 
 
-@views.route("/create", methods=["POST"])
-async def create():
+async def send_code(phone_number: str, telegram_api_id: str, telegram_api_hash: str):
+    async with Client(phone_number, telegram_api_id, telegram_api_hash) as client:
+        try:
+            sent_code = await client.send_code(phone_number)
+            logging.info("Sent code to: " + phone_number)
+        except Exception as e:
+            logging.error("Error sending code: " + str(e))
+            raise e
+
+        phone_code_hash = sent_code.phone_code_hash
+        return jsonify(
+            {
+                "success": True,
+                "phone_code_hash": phone_code_hash,
+                "phone_number": phone_number,
+            }
+        )
+
+
+async def get_session_string(
+    phone_number: str,
+    telegram_api_id: str,
+    telegram_api_hash: str,
+    phone_code_hash: str,
+    auth_code: str,
+):
+    async with Client(
+        phone_number, api_id=telegram_api_id, api_hash=telegram_api_hash
+    ) as client:
+        try:
+            session_string = await client.sign_in(
+                phone_number=phone_number,
+                phone_code_hash=phone_code_hash,
+                phone_code=auth_code,
+            )
+            logging.info("Signed in to: " + phone_number)
+        except Exception as e:
+            logging.error("Error signing in: " + str(e))
+            raise e
+
+        return jsonify(
+            {
+                "success": True,
+                "session_string": session_string,
+                "phone_number": phone_number,
+            }
+        )
+
+
+@views.route("/send_code_1", methods=["POST"])
+async def send_code_1():
     payload = await request.get_json()
 
     phone_number = payload.get("phone_number")
@@ -38,49 +87,141 @@ async def create():
     pipedrive_client_id = payload.get("pipedrive_client_id")
     pipedrive_client_secret = payload.get("pipedrive_client_secret")
 
-    # create the client to send the code
-    client = Client(phone_number, api_id=telegram_api_id, api_hash=telegram_api_hash)
-    await storage.put_client(phone_number, client)
-    await client.connect()
-    logging.info("Client connected, sending code")
-
-    sent_code = await client.send_code(phone_number)
-    logging.info("Sent code to: " + phone_number)
-
-    phone_code_hash = sent_code.phone_code_hash
-
     # store this info in a database
-    with SQLQueryRunner(get_db()) as cursor:
+    with SQLQueryRunner() as cursor:
         logging.info("Inserting credentials into database")
-        sql = run_query("insert_telegram_credentials.sql", phone_number=phone_number, phone_code_hash=phone_code_hash,
-                        telegram_api_id=telegram_api_id, telegram_api_hash=telegram_api_hash,
-                        pipedrive_client_id=pipedrive_client_id, pipedrive_client_secret=pipedrive_client_secret)
+        sql = run_query(
+            "insert_telegram_credentials.sql",
+            phone_number=phone_number,
+            telegram_api_id=telegram_api_id,
+            telegram_api_hash=telegram_api_hash,
+            pipedrive_client_id=pipedrive_client_id,
+            pipedrive_client_secret=pipedrive_client_secret,
+        )
         cursor.execute(sql)
 
-    result = jsonify({"message": "Payload received successfully"})
+    try:
+        phone_code_hash = await send_code(
+            phone_number, telegram_api_id, telegram_api_hash
+        )
+    except Exception as e:
+        logging.error("Error sending code: " + str(e))
+        return jsonify({"success": False, "error": str(e)})
 
-    return result
+    return jsonify(
+        {
+            "success": True,
+            "phone_code_hash": phone_code_hash,
+            "phone_number": phone_number,
+        }
+    )
 
 
-@views.route('/verify', methods=['POST'])
-async def verify():
+@views.route("/send_code_2", methods=["POST"])
+async def send_code_2():
     payload = await request.get_json()
 
     phone_number = payload.get("phone_number")
-    auth_code = payload.get("auth_code")
 
-    with SQLQueryRunner(get_db()) as cursor:
+    with SQLQueryRunner() as cursor:
         logging.info("Selecting phone number")
-        sql = run_query('select_phone_number.sql', phone_number=phone_number)
+        sql = run_query("select_phone_number.sql", phone_number=phone_number)
         cursor.execute(sql)
 
-        result = pd.DataFrame(cursor.fetchall()).iloc[0]
+        result = pd.DataFrame(cursor.fetchone()).iloc[0]
 
-    phone_code_hash = result['phone_code_hash']
-    pipedrive_client_id = result['pipedrive_client_id']
+    telegram_api_id = result["telegram_api_id"]
+    telegram_api_hash = result["telegram_api_hash"]
 
-    client = await storage.get_client(phone_number)
-    client.add_handler(MessageHandler(new_message))
-    await client.sign_in(phone_number=phone_number, phone_code_hash=phone_code_hash, phone_code=auth_code)
+    try:
+        phone_code_hash = await send_code(
+            phone_number, telegram_api_id, telegram_api_hash
+        )
+    except Exception as e:
+        logging.error("Error sending code: " + str(e))
+        return jsonify({"success": False, "error": str(e)})
 
-    return jsonify({"pipedrive_client_id": pipedrive_client_id})
+    return jsonify(
+        {
+            "success": True,
+            "phone_code_hash": phone_code_hash,
+            "phone_number": phone_number,
+        }
+    )
+
+
+@views.route("/create_string_1", methods=["POST"])
+async def create_string_1():
+    payload = await request.get_json()
+
+    phone_number = payload.get("phone_number")
+    phone_code_hash = payload.get("phone_code_hash")
+    auth_code = payload.get("auth_code")
+
+    with SQLQueryRunner() as cursor:
+        logging.info("Selecting phone number")
+        sql = run_query("select_phone_number.sql", phone_number=phone_number)
+        cursor.execute(sql)
+
+        result = pd.DataFrame(cursor.fetchone()).iloc[0]
+
+    telegram_api_id = result["telegram_api_id"]
+    telegram_api_hash = result["telegram_api_hash"]
+
+    session_string = await get_session_string(
+        phone_number,
+        telegram_api_id,
+        telegram_api_hash,
+        phone_code_hash,
+        auth_code,
+    )
+
+    with SQLQueryRunner() as cursor:
+        logging.info("Inserting session string into database")
+        sql = run_query(
+            "insert_on_message_string.sql",
+            phone_number=phone_number,
+            on_message_string=session_string,
+        )
+        cursor.execute(sql)
+
+    return jsonify({"success": True})
+
+
+@views.route("/create_string_2", methods=["POST"])
+async def create_string_2():
+    payload = await request.get_json()
+
+    phone_number = payload.get("phone_number")
+    phone_code_hash = payload.get("phone_code_hash")
+    auth_code = payload.get("auth_code")
+
+    with SQLQueryRunner() as cursor:
+        logging.info("Selecting phone number")
+        sql = run_query("select_phone_number.sql", phone_number=phone_number)
+        cursor.execute(sql)
+
+        result = pd.DataFrame(cursor.fetchone()).iloc[0]
+
+    pipedrive_client_id = result["pipedrive_client_id"]
+    telegram_api_id = result["telegram_api_id"]
+    telegram_api_hash = result["telegram_api_hash"]
+
+    session_string = await get_session_string(
+        phone_number,
+        telegram_api_id,
+        telegram_api_hash,
+        phone_code_hash,
+        auth_code,
+    )
+
+    with SQLQueryRunner() as cursor:
+        logging.info("Inserting session string into database")
+        sql = run_query(
+            "insert_send_message_string.sql",
+            phone_number=phone_number,
+            send_message_string=session_string,
+        )
+        cursor.execute(sql)
+
+    return jsonify({"success": True, "pipedrive_client_id": pipedrive_client_id})

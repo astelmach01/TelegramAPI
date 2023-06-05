@@ -14,12 +14,10 @@ load_dotenv()
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.StreamHandler()
-    ]
+    handlers=[logging.StreamHandler()],
 )
 
-queries_dir = os.path.join(os.getcwd(), 'website', 'queries')
+queries_dir = os.path.join(os.getcwd(), "website", "queries")
 
 # Set up the Jinja environment to load templates from the "/queries" directory
 jinja_env = Environment(loader=FileSystemLoader(queries_dir), autoescape=True)
@@ -32,7 +30,10 @@ def run_query(file_name: str, **kwargs):
 
 
 class SQLQueryRunner:
-    def __init__(self, connection):
+    def __init__(self, connection=None):
+        if connection is None:
+            connection = get_db()
+
         self.connection = connection
 
     def __enter__(self):
@@ -63,10 +64,10 @@ def get_db():
             port=db_port,
             user=db_username,
             password=db_password,
-            database='BASE',
-            charset='utf8mb4',
+            database="BASE",
+            charset="utf8mb4",
             cursorclass=pymysql.cursors.DictCursor,
-            autocommit=True
+            autocommit=True,
         )
 
         logging.info("Connected to the database")

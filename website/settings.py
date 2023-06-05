@@ -13,26 +13,25 @@ load_dotenv()
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.StreamHandler()
-    ]
+    handlers=[logging.StreamHandler()],
 )
 
 region_name = "us-east-2"
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
-    logging.info("AWS credentials not found.")
-    
+    raise Exception(
+        "AWS_ACCESS_KEY or AWS_SECRET_ACCESS_KEY not found in environment variables"
+    )
+
 else:
     # Create a Secrets Manager client
-    session = boto3.session.Session(aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-    
-client = session.client(
-    service_name='secretsmanager',
-    region_name=region_name
-)
+    session = boto3.session.Session(
+        aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+    )
+
+client = session.client(service_name="secretsmanager", region_name=region_name)
 
 # Configure secret cache
 cache_config = SecretCacheConfig()
