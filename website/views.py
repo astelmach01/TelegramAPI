@@ -28,15 +28,16 @@ async def new_message(client, message):
 
 
 async def send_code(phone_number: str, telegram_api_id: str, telegram_api_hash: str):
-    async with Client(phone_number, telegram_api_id, telegram_api_hash) as client:
-        try:
-            sent_code = await client.send_code(phone_number)
-            logging.info("Sent code to: " + phone_number)
-        except Exception as e:
-            logging.error("Error sending code: " + str(e))
-            raise e
+    client = Client(phone_number, telegram_api_id, telegram_api_hash)
+    await client.connect()
+
+    try:
+        sent_code = await client.send_code(phone_number)
+        logging.info("Sent code to: " + phone_number)
 
         phone_code_hash = sent_code.phone_code_hash
+
+        await client.disconnect()
         return jsonify(
             {
                 "success": True,
@@ -44,6 +45,10 @@ async def send_code(phone_number: str, telegram_api_id: str, telegram_api_hash: 
                 "phone_number": phone_number,
             }
         )
+    except Exception as e:
+        logging.error("Error sending code: " + str(e))
+        await client.disconnect()
+        raise e
 
 
 async def get_session_string(
@@ -53,27 +58,29 @@ async def get_session_string(
     phone_code_hash: str,
     auth_code: str,
 ):
-    async with Client(
-        phone_number, api_id=telegram_api_id, api_hash=telegram_api_hash
-    ) as client:
-        try:
-            session_string = await client.sign_in(
-                phone_number=phone_number,
-                phone_code_hash=phone_code_hash,
-                phone_code=auth_code,
-            )
-            logging.info("Signed in to: " + phone_number)
-        except Exception as e:
-            logging.error("Error signing in: " + str(e))
-            raise e
-
-        return jsonify(
-            {
-                "success": True,
-                "session_string": session_string,
-                "phone_number": phone_number,
-            }
+    client = Client(phone_number, telegram_api_id, telegram_api_hash)
+    await client.connect()
+    try:
+        await client.sign_in(
+            phone_number=phone_number,
+            phone_code_hash=phone_code_hash,
+            phone_code=auth_code,
         )
+        session_string = client.export_session_string()
+        await client.disconnect()
+        logging.info("Signed in to: " + phone_number)
+    except Exception as e:
+        logging.error("Error signing in: " + str(e))
+        await client.disconnect()
+        raise e
+
+    return jsonify(
+        {
+            "success": True,
+            "session_string": session_string,
+            "phone_number": phone_number,
+        }
+    )
 
 
 @views.route("/send_code_1", methods=["POST"])
