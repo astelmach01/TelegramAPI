@@ -169,7 +169,7 @@ async def create_string_1():
         sql = run_query("select_phone_number.sql", phone_number=phone_number)
         cursor.execute(sql)
 
-        result = pd.DataFrame(cursor.fetchone()).iloc[0]
+        result = pd.DataFrame(cursor.fetchone(), index=[0]).iloc[0]
 
     telegram_api_id = result["telegram_api_id"]
     telegram_api_hash = result["telegram_api_hash"]
