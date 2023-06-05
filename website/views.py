@@ -168,7 +168,7 @@ async def create_string_2():
     session_string = await client.export_session_string()
 
     with SQLQueryRunner() as cursor:
-        logging.info("Inserting session string into database")
+        logging.info("Inserting session string 2 into database")
         sql = run_query(
             "insert_send_message_string.sql",
             phone_number=phone_number,
