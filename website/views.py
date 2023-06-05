@@ -1,15 +1,22 @@
 """
 Routes
 """
+import json
 import logging
 
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
-from quart import Blueprint, request, jsonify, session
+from quart import Blueprint, render_template, request, jsonify
 import pandas as pd
 from .util import run_query, SQLQueryRunner, get_db
+from .core import storage
 
 views = Blueprint("views", __name__)
+
+# this is to sync up the host of this api and the provider api so the load balancer uses the same machine (session stickiness) between the two HTTP requests. This should be the first call between the provider API.
+@views.route("/sync")
+async def sync():
+    return jsonify({"status": "success"})
 
 
 async def new_message(client, message):
@@ -25,58 +32,6 @@ async def new_message(client, message):
         msg=msg,
         sender_id=sender_id,
     )
-
-
-async def send_code(phone_number: str, telegram_api_id: str, telegram_api_hash: str):
-    client = Client(phone_number, telegram_api_id, telegram_api_hash)
-    await client.connect()
-
-    try:
-        sent_code = await client.send_code(phone_number)
-        logging.info("Sent code to: " + phone_number)
-
-        phone_code_hash = sent_code.phone_code_hash
-
-        return {
-            "success": True,
-            "phone_code_hash": phone_code_hash,
-            "phone_number": phone_number,
-        }
-
-    except Exception as e:
-        logging.error("Error sending code: " + str(e))
-        raise e
-
-
-async def get_session_string(
-    phone_number: str,
-    telegram_api_id: str,
-    telegram_api_hash: str,
-    phone_code_hash: str,
-    auth_code: str,
-):
-    client = Client(phone_number, telegram_api_id, telegram_api_hash)
-    await client.connect()
-    try:
-        await client.sign_in(
-            phone_number=phone_number,
-            phone_code_hash=phone_code_hash,
-            phone_code=auth_code,
-        )
-        session_string = client.export_session_string()
-        await client.disconnect()
-        logging.info("Signed in to: " + phone_number)
-    except Exception as e:
-        logging.error("Error signing in: " + str(e))
-        await client.disconnect()
-        raise e
-
-    return {
-            "success": True,
-            "session_string": session_string,
-            "phone_number": phone_number,
-        }
-    
 
 
 @views.route("/send_code_1", methods=["POST"])
@@ -102,16 +57,22 @@ async def send_code_1():
         )
         cursor.execute(sql)
 
+    client = Client(phone_number, telegram_api_id, telegram_api_hash)
+    await client.connect()
+    
+    storage.put_on_message_client(phone_number, client)
+
     try:
-        response = await send_code(
-            phone_number, telegram_api_id, telegram_api_hash
-        )
+        sent_code = await client.send_code(phone_number)
+
     except Exception as e:
         logging.error("Error sending code: " + str(e))
         return jsonify({"success": False, "error": str(e)})
 
-    phone_code_hash = response["phone_code_hash"]
-    
+    logging.info("Sent code to: " + phone_number)
+
+    phone_code_hash = sent_code.phone_code_hash
+
     return jsonify(
         {
             "success": True,
@@ -136,14 +97,19 @@ async def send_code_2():
 
     telegram_api_id = result["telegram_api_id"]
     telegram_api_hash = result["telegram_api_hash"]
+    
+    client = Client(phone_number, telegram_api_id, telegram_api_hash)
+    await client.connect()
+    
+    storage.put_send_message_client(phone_number, client)
 
     try:
-        phone_code_hash = await send_code(
-            phone_number, telegram_api_id, telegram_api_hash
-        )
+        sent_code = await client.send_code(phone_number)
     except Exception as e:
         logging.error("Error sending code: " + str(e))
         return jsonify({"success": False, "error": str(e)})
+    
+    phone_code_hash = sent_code.phone_code_hash
 
     return jsonify(
         {
@@ -162,25 +128,10 @@ async def create_string_1():
     phone_code_hash = payload.get("phone_code_hash")
     auth_code = payload.get("auth_code")
 
-    with SQLQueryRunner() as cursor:
-        logging.info("Selecting phone number")
-        sql = run_query("select_phone_number.sql", phone_number=phone_number)
-        cursor.execute(sql)
-
-        result = pd.DataFrame(cursor.fetchone(), index=[0]).iloc[0]
-
-    telegram_api_id = result["telegram_api_id"]
-    telegram_api_hash = result["telegram_api_hash"]
-
-    response = await get_session_string(
-        phone_number,
-        telegram_api_id,
-        telegram_api_hash,
-        phone_code_hash,
-        auth_code,
-    )
+    client = await storage.get_on_message_client(phone_number)
+    await client.sign_in(phone_number, phone_code_hash, auth_code)
     
-    session_string = response["session_string"]
+    session_string = await client.export_session_string()
 
     with SQLQueryRunner() as cursor:
         logging.info("Inserting session string into database")
@@ -210,16 +161,11 @@ async def create_string_2():
         result = pd.DataFrame(cursor.fetchone(), index=[0]).iloc[0]
 
     pipedrive_client_id = result["pipedrive_client_id"]
-    telegram_api_id = result["telegram_api_id"]
-    telegram_api_hash = result["telegram_api_hash"]
 
-    session_string = await get_session_string(
-        phone_number,
-        telegram_api_id,
-        telegram_api_hash,
-        phone_code_hash,
-        auth_code,
-    )
+    client = storage.get_send_message_client(phone_number)
+    await client.sign_in(phone_number, phone_code_hash, auth_code)
+    
+    session_string = await client.export_session_string()
 
     with SQLQueryRunner() as cursor:
         logging.info("Inserting session string into database")
