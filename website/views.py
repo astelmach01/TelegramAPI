@@ -116,11 +116,11 @@ async def sign_in(
     phone_number: str,
     phone_code_hash: str,
     auth_code: str,
-    type: Literal["on_message", "send_message"],
+    client_type: Literal["on_message", "send_message"],
 ):
-    if type == "on_message":
+    if client_type == "on_message":
         client = await storage.get_on_message_client(phone_number)
-    elif type == "send_message":
+    elif client_type == "send_message":
         client = await storage.get_send_message_client(phone_number)
 
     await client.sign_in(phone_number, phone_code_hash, auth_code)
@@ -130,13 +130,13 @@ async def sign_in(
     with SQLQueryRunner() as cursor:
         logging.info("Inserting session string into database")
 
-        if type == "on_message":
+        if client_type == "on_message":
             sql = run_query(
                 "insert_on_message_string.sql",
                 phone_number=phone_number,
                 on_message_string=session_string,
             )
-        elif type == "send_message":
+        elif client_type == "send_message":
             sql = run_query(
                 "insert_send_message_string.sql",
                 phone_number=phone_number,
@@ -157,7 +157,7 @@ async def create_string_1():
     auth_code = payload.get("auth_code")
 
     response = await sign_in(
-        phone_number, phone_code_hash, auth_code, type="on_message"
+        phone_number, phone_code_hash, auth_code, client_type="on_message"
     )
 
     return jsonify(response)
@@ -172,7 +172,7 @@ async def create_string_2():
     auth_code = payload.get("auth_code")
 
     response = await sign_in(
-        phone_number, phone_code_hash, auth_code, type="send_message"
+        phone_number, phone_code_hash, auth_code, client_type="send_message"
     )
 
     # get the pd client id
