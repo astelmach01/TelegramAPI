@@ -1,7 +1,6 @@
 """
 Routes
 """
-import json
 import logging
 
 from pyrogram import Client
@@ -9,7 +8,7 @@ from pyrogram.handlers import MessageHandler
 from quart import Blueprint, request, jsonify
 import pandas as pd
 from .util import run_query, SQLQueryRunner
-from .core import storage
+from .core import storage, new_message
 
 views = Blueprint("views", __name__)
 
@@ -19,20 +18,6 @@ views = Blueprint("views", __name__)
 async def sync():
     return jsonify({"status": "success"})
 
-
-async def new_message(client, message):
-    msg = message.text
-    sender_id = str(message.from_user.id)
-    time = message.date
-
-    logging.info("Got a message", msg, sender_id, time)
-
-    await send_message_to_PD(
-        access_token,
-        time=time,
-        msg=msg,
-        sender_id=sender_id,
-    )
 
 
 @views.route("/send_code_1", methods=["POST"])
@@ -58,8 +43,10 @@ async def send_code_1():
         )
         cursor.execute(sql)
 
-    client = Client(phone_number + "-on-message", telegram_api_id, telegram_api_hash)
+    client = Client(phone_number + "-on-message", telegram_api_id, telegram_api_hash, phone_number=phone_number)
     await client.connect()
+    
+    client.add_handler(MessageHandler(new_message))
 
     await storage.put_on_message_client(phone_number, client)
 
@@ -99,8 +86,11 @@ async def send_code_2():
     telegram_api_id = result["telegram_api_id"]
     telegram_api_hash = result["telegram_api_hash"]
 
-    client = Client(phone_number + "-send-message", telegram_api_id, telegram_api_hash)
+    client = Client(phone_number + "-send-message", telegram_api_id, telegram_api_hash, phone_number=phone_number)
     await client.connect()
+    
+    client.add_handler(MessageHandler(new_message))
+    
 
     await storage.put_send_message_client(phone_number, client)
 

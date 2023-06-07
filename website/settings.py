@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     db_port: int
     TELEGRAM_API_ID: str
     TELEGRAM_API_HASH: str
+    PIPEDRIVE_API_URL: str
     ENVIRONMENT: str
     PORT: int
 

@@ -1,4 +1,12 @@
+from datetime import datetime, timezone
+from turtle import settiltangle
+import aiohttp
+import logging
+
 from pyrogram import Client
+
+from website import settings
+
 
 
 class ClientStorage:
@@ -17,6 +25,44 @@ class ClientStorage:
 
     async def put_send_message_client(self, phone_number, client):
         self.send_message_clients[phone_number] = client
+
+
+async def new_message(client, message):
+    
+    msg = message.text
+    sender_id = str(message.from_user.id)
+    conversation_id = str(message.chat.id)
+    receiving_phone_number = client.phone_number
+    time = message.date
+
+    logging.info("Got a message", msg, sender_id, time)
+
+    await send_message_to_provider(
+        receiving_phone_number=receiving_phone_number,
+        time=time,
+        msg=msg,
+        conversation_id=conversation_id,
+        sender_id=sender_id,
+    )
+    
+async def send_message_to_provider(msg: str, receiving_phone_number: str, time: datetime, sender_id: str, conversation_id: str):
+    logging.info("Sending message to Pipedrive Provider API")
+
+    url = settings.PIPEDRIVE_API_URL
+    
+    json = {
+        "msg": msg,
+        "receiving_phone_number": receiving_phone_number,
+        "time": time,
+        "sender_id": sender_id,
+        "conversation_id": conversation_id,
+    }
+    
+    # send a post request to url + "/channels/messages/receive
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url + "/channels/messages/receive", json=json) as response:
+            res = await response.json()
+            logging.info("Response from Pipedrive Provider API", res)
 
 
 storage = ClientStorage()
