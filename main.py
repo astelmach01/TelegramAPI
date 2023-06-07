@@ -12,7 +12,7 @@ app = create_app()
 
 async def start():
     config = Config()
-    port = os.getenv("PORT", 5000)
+    port = os.getenv("PORT", 80)
     config.bind = [f"0.0.0.0:{port}"]
 
     await hypercorn.asyncio.serve(app, config)

@@ -6,12 +6,13 @@ import logging
 
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
-from quart import Blueprint, render_template, request, jsonify
+from quart import Blueprint, request, jsonify
 import pandas as pd
 from .util import run_query, SQLQueryRunner
 from .core import storage
 
 views = Blueprint("views", __name__)
+
 
 # this is to sync up the host of this api and the provider api so the load balancer uses the same machine (session stickiness) between the two HTTP requests. This should be the first call between the provider API.
 @views.route("/sync")
@@ -59,7 +60,7 @@ async def send_code_1():
 
     client = Client(phone_number + "-on-message", telegram_api_id, telegram_api_hash)
     await client.connect()
-    
+
     await storage.put_on_message_client(phone_number, client)
 
     try:
@@ -97,10 +98,10 @@ async def send_code_2():
 
     telegram_api_id = result["telegram_api_id"]
     telegram_api_hash = result["telegram_api_hash"]
-    
+
     client = Client(phone_number + "-send-message", telegram_api_id, telegram_api_hash)
     await client.connect()
-    
+
     await storage.put_send_message_client(phone_number, client)
 
     try:
@@ -108,7 +109,7 @@ async def send_code_2():
     except Exception as e:
         logging.error("Error sending code: " + str(e))
         return jsonify({"success": False, "error": str(e)})
-    
+
     phone_code_hash = sent_code.phone_code_hash
 
     return jsonify(
@@ -130,7 +131,7 @@ async def create_string_1():
 
     client = await storage.get_on_message_client(phone_number)
     await client.sign_in(phone_number, phone_code_hash, auth_code)
-    
+
     session_string = await client.export_session_string()
 
     with SQLQueryRunner() as cursor:
@@ -164,7 +165,7 @@ async def create_string_2():
 
     client = await storage.get_send_message_client(phone_number)
     await client.sign_in(phone_number, phone_code_hash, auth_code)
-    
+
     session_string = await client.export_session_string()
 
     with SQLQueryRunner() as cursor:
