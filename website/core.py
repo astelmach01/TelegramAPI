@@ -8,7 +8,6 @@ from pyrogram import Client
 from website import settings
 
 
-
 class ClientStorage:
     def __init__(self):
         self.on_message_clients: dict[str, Client] = {}
@@ -28,7 +27,6 @@ class ClientStorage:
 
 
 async def new_message(client, message):
-    
     msg = message.text
     sender_id = str(message.from_user.id)
     conversation_id = str(message.chat.id)
@@ -44,12 +42,19 @@ async def new_message(client, message):
         conversation_id=conversation_id,
         sender_id=sender_id,
     )
-    
-async def send_message_to_provider(msg: str, receiving_phone_number: str, time: datetime, sender_id: str, conversation_id: str):
+
+
+async def send_message_to_provider(
+    msg: str,
+    receiving_phone_number: str,
+    time: datetime,
+    sender_id: str,
+    conversation_id: str,
+):
     logging.info("Sending message to Pipedrive Provider API")
 
     url = settings.PIPEDRIVE_API_URL
-    
+
     json = {
         "msg": msg,
         "receiving_phone_number": receiving_phone_number,
@@ -57,10 +62,12 @@ async def send_message_to_provider(msg: str, receiving_phone_number: str, time: 
         "sender_id": sender_id,
         "conversation_id": conversation_id,
     }
-    
+
     # send a post request to url + "/channels/messages/receive
     async with aiohttp.ClientSession() as session:
-        async with session.post(url + "/channels/messages/receive", json=json) as response:
+        async with session.post(
+            url + "/channels/messages/receive", json=json
+        ) as response:
             res = await response.json()
             logging.info("Response from Pipedrive Provider API", res)
 

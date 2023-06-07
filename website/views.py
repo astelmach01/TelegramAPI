@@ -19,7 +19,6 @@ async def sync():
     return jsonify({"status": "success"})
 
 
-
 @views.route("/send_code_1", methods=["POST"])
 async def send_code_1():
     payload = await request.get_json()
@@ -43,9 +42,14 @@ async def send_code_1():
         )
         cursor.execute(sql)
 
-    client = Client(phone_number + "-on-message", telegram_api_id, telegram_api_hash, phone_number=phone_number)
+    client = Client(
+        phone_number + "-on-message",
+        telegram_api_id,
+        telegram_api_hash,
+        phone_number=phone_number,
+    )
     await client.connect()
-    
+
     client.add_handler(MessageHandler(new_message))
 
     await storage.put_on_message_client(phone_number, client)
@@ -86,11 +90,15 @@ async def send_code_2():
     telegram_api_id = result["telegram_api_id"]
     telegram_api_hash = result["telegram_api_hash"]
 
-    client = Client(phone_number + "-send-message", telegram_api_id, telegram_api_hash, phone_number=phone_number)
+    client = Client(
+        phone_number + "-send-message",
+        telegram_api_id,
+        telegram_api_hash,
+        phone_number=phone_number,
+    )
     await client.connect()
-    
+
     client.add_handler(MessageHandler(new_message))
-    
 
     await storage.put_send_message_client(phone_number, client)
 
