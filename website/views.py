@@ -2,6 +2,7 @@
 Routes
 """
 import logging
+from typing import Literal
 
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
@@ -17,6 +18,45 @@ views = Blueprint("views", __name__)
 @views.route("/sync")
 async def sync():
     return jsonify({"status": "success"})
+
+
+async def create_and_send_code(
+    phone_number: str,
+    telegram_api_id: str,
+    telegram_api_hash: str,
+    client_type: Literal["on_message", "send_message"],
+):
+    name = phone_number + "-" + client_type
+    client = Client(
+        name,
+        telegram_api_id,
+        telegram_api_hash,
+        phone_number=phone_number,
+    )
+    await client.connect()
+
+    client.add_handler(MessageHandler(new_message))
+
+    if client_type == "on_message":
+        await storage.put_on_message_client(phone_number, client)
+    elif client_type == "send_message":
+        await storage.put_send_message_client(phone_number, client)
+
+    try:
+        sent_code = await client.send_code(phone_number)
+
+    except Exception as e:
+        logging.error("Error sending code: " + str(e))
+        return {"success": False, "error": str(e)}
+
+    logging.info("Sent code to: " + phone_number)
+    phone_code_hash = sent_code.phone_code_hash
+
+    return {
+        "success": True,
+        "phone_code_hash": phone_code_hash,
+        "phone_number": phone_number,
+    }
 
 
 @views.route("/send_code_1", methods=["POST"])
@@ -42,36 +82,11 @@ async def send_code_1():
         )
         cursor.execute(sql)
 
-    client = Client(
-        phone_number + "-on-message",
-        telegram_api_id,
-        telegram_api_hash,
-        phone_number=phone_number,
+    response = await create_and_send_code(
+        phone_number, telegram_api_id, telegram_api_hash, client_type="on_message"
     )
-    await client.connect()
 
-    client.add_handler(MessageHandler(new_message))
-
-    await storage.put_on_message_client(phone_number, client)
-
-    try:
-        sent_code = await client.send_code(phone_number)
-
-    except Exception as e:
-        logging.error("Error sending code: " + str(e))
-        return jsonify({"success": False, "error": str(e)})
-
-    logging.info("Sent code to: " + phone_number)
-
-    phone_code_hash = sent_code.phone_code_hash
-
-    return jsonify(
-        {
-            "success": True,
-            "phone_code_hash": phone_code_hash,
-            "phone_number": phone_number,
-        }
-    )
+    return jsonify(response)
 
 
 @views.route("/send_code_2", methods=["POST"])
@@ -90,33 +105,47 @@ async def send_code_2():
     telegram_api_id = result["telegram_api_id"]
     telegram_api_hash = result["telegram_api_hash"]
 
-    client = Client(
-        phone_number + "-send-message",
-        telegram_api_id,
-        telegram_api_hash,
-        phone_number=phone_number,
+    response = await create_and_send_code(
+        phone_number, telegram_api_id, telegram_api_hash, client_type="send_message"
     )
-    await client.connect()
 
-    client.add_handler(MessageHandler(new_message))
+    return jsonify(response)
 
-    await storage.put_send_message_client(phone_number, client)
 
-    try:
-        sent_code = await client.send_code(phone_number)
-    except Exception as e:
-        logging.error("Error sending code: " + str(e))
-        return jsonify({"success": False, "error": str(e)})
+async def sign_in(
+    phone_number: str,
+    phone_code_hash: str,
+    auth_code: str,
+    type: Literal["on_message", "send_message"],
+):
+    if type == "on_message":
+        client = await storage.get_on_message_client(phone_number)
+    elif type == "send_message":
+        client = await storage.get_send_message_client(phone_number)
 
-    phone_code_hash = sent_code.phone_code_hash
+    await client.sign_in(phone_number, phone_code_hash, auth_code)
 
-    return jsonify(
-        {
-            "success": True,
-            "phone_code_hash": phone_code_hash,
-            "phone_number": phone_number,
-        }
-    )
+    session_string = await client.export_session_string()
+
+    with SQLQueryRunner() as cursor:
+        logging.info("Inserting session string into database")
+
+        if type == "on_message":
+            sql = run_query(
+                "insert_on_message_string.sql",
+                phone_number=phone_number,
+                on_message_string=session_string,
+            )
+        elif type == "send_message":
+            sql = run_query(
+                "insert_send_message_string.sql",
+                phone_number=phone_number,
+                send_message_string=session_string,
+            )
+
+        cursor.execute(sql)
+
+    return {"success": True}
 
 
 @views.route("/create_string_1", methods=["POST"])
@@ -127,21 +156,11 @@ async def create_string_1():
     phone_code_hash = payload.get("phone_code_hash")
     auth_code = payload.get("auth_code")
 
-    client = await storage.get_on_message_client(phone_number)
-    await client.sign_in(phone_number, phone_code_hash, auth_code)
+    response = await sign_in(
+        phone_number, phone_code_hash, auth_code, type="on_message"
+    )
 
-    session_string = await client.export_session_string()
-
-    with SQLQueryRunner() as cursor:
-        logging.info("Inserting session string into database")
-        sql = run_query(
-            "insert_on_message_string.sql",
-            phone_number=phone_number,
-            on_message_string=session_string,
-        )
-        cursor.execute(sql)
-
-    return jsonify({"success": True})
+    return jsonify(response)
 
 
 @views.route("/create_string_2", methods=["POST"])
@@ -152,6 +171,11 @@ async def create_string_2():
     phone_code_hash = payload.get("phone_code_hash")
     auth_code = payload.get("auth_code")
 
+    response = await sign_in(
+        phone_number, phone_code_hash, auth_code, type="send_message"
+    )
+
+    # get the pd client id
     with SQLQueryRunner() as cursor:
         logging.info("Selecting phone number")
         sql = run_query("select_phone_number.sql", phone_number=phone_number)
@@ -161,18 +185,6 @@ async def create_string_2():
 
     pipedrive_client_id = result["pipedrive_client_id"]
 
-    client = await storage.get_send_message_client(phone_number)
-    await client.sign_in(phone_number, phone_code_hash, auth_code)
+    response["pipedrive_client_id"] = pipedrive_client_id
 
-    session_string = await client.export_session_string()
-
-    with SQLQueryRunner() as cursor:
-        logging.info("Inserting session string 2 into database")
-        sql = run_query(
-            "insert_send_message_string.sql",
-            phone_number=phone_number,
-            send_message_string=session_string,
-        )
-        cursor.execute(sql)
-
-    return jsonify({"success": True, "pipedrive_client_id": pipedrive_client_id})
+    return jsonify(response)
