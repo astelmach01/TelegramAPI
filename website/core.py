@@ -1,5 +1,4 @@
-from datetime import datetime, timezone
-from turtle import settiltangle
+from datetime import datetime
 import aiohttp
 import logging
 
