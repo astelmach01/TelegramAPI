@@ -61,7 +61,7 @@ async def send_message_to_provider(
 
     url = settings.PIPEDRIVE_API_URL
     
-    if type(time) == datetime:
+    if type(time) != str:
         time = time.strftime("%Y-%m-%d %H:%M:%S")
 
     json = {
