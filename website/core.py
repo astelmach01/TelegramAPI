@@ -41,9 +41,6 @@ async def new_message(client, message):
     receiving_phone_number = client.phone_number
     time = message.date
 
-    print(type(str(msg)), type(sender_id), type(str(time)))
-    logging.info("Got a message", str(msg), sender_id, str(time))
-
     await send_message_to_provider(
         receiving_phone_number=receiving_phone_number,
         time=time,
@@ -78,7 +75,7 @@ async def send_message_to_provider(
     # send a post request to url + "/channels/messages/receive
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            url + "/channels/messages/receive", json=json
+            url + "channels/messages/receive", json=json
         ) as response:
             res = await response.json()
             logging.info("Response from Pipedrive Provider API", res)
