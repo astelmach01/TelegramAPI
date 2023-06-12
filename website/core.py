@@ -41,8 +41,8 @@ async def new_message(client, message):
     receiving_phone_number = client.phone_number
     time = message.date
 
-    print(type(msg), type(sender_id), type(str(time)))
-    logging.info("Got a message", msg, sender_id, str(time))
+    print(type(str(msg)), type(sender_id), type(str(time)))
+    logging.info("Got a message", str(msg), sender_id, str(time))
 
     await send_message_to_provider(
         receiving_phone_number=receiving_phone_number,
@@ -56,13 +56,16 @@ async def new_message(client, message):
 async def send_message_to_provider(
     msg: str,
     receiving_phone_number: str,
-    time: datetime,
+    time: datetime | str,
     sender_id: str,
     conversation_id: str,
 ):
     logging.info("Sending message from Telegram to Pipedrive Provider API")
 
     url = settings.PIPEDRIVE_API_URL
+    
+    if type(time) == datetime:
+        time = time.strftime("%Y-%m-%d %H:%M:%S")
 
     json = {
         "msg": msg,
