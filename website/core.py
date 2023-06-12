@@ -4,7 +4,7 @@ import logging
 
 from pyrogram import Client
 
-from website import settings
+from website.settings import settings
 
 
 class ClientManager:
