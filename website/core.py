@@ -7,7 +7,7 @@ from pyrogram import Client
 from website import settings
 
 
-class ClientStorage:
+class ClientManager:
     def __init__(self):
         self.on_message_clients: dict[str, Client] = {}
         self.send_message_clients: dict[str, Client] = {}
@@ -23,6 +23,15 @@ class ClientStorage:
 
     async def put_send_message_client(self, phone_number, client):
         self.send_message_clients[phone_number] = client
+
+    async def start_client(self, client: Client):
+        try:
+            await client.disconnect()   
+        except:
+            # client was not connected in the first place, that's fine
+            pass
+        logging.info("Starting client!")
+        await client.start()
 
 
 async def new_message(client, message):
@@ -50,7 +59,7 @@ async def send_message_to_provider(
     sender_id: str,
     conversation_id: str,
 ):
-    logging.info("Sending message to Pipedrive Provider API")
+    logging.info("Sending message from Telegram to Pipedrive Provider API")
 
     url = settings.PIPEDRIVE_API_URL
 
@@ -71,4 +80,4 @@ async def send_message_to_provider(
             logging.info("Response from Pipedrive Provider API", res)
 
 
-storage = ClientStorage()
+manager = ClientManager()

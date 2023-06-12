@@ -8,8 +8,10 @@ from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from quart import Blueprint, request, jsonify
 import pandas as pd
+import asyncio
+
 from .util import run_query, SQLQueryRunner
-from .core import storage, new_message
+from .core import manager, new_message
 
 views = Blueprint("views", __name__)
 
@@ -38,9 +40,9 @@ async def create_and_send_code(
     client.add_handler(MessageHandler(new_message))
 
     if client_type == "on_message":
-        await storage.put_on_message_client(phone_number, client)
+        await manager.put_on_message_client(phone_number, client)
     elif client_type == "send_message":
-        await storage.put_send_message_client(phone_number, client)
+        await manager.put_send_message_client(phone_number, client)
 
     try:
         sent_code = await client.send_code(phone_number)
@@ -112,16 +114,16 @@ async def send_code_2():
     return jsonify(response)
 
 
-async def sign_in(
+async def sign_in_and_start(
     phone_number: str,
     phone_code_hash: str,
     auth_code: str,
     client_type: Literal["on_message", "send_message"],
 ):
     if client_type == "on_message":
-        client = await storage.get_on_message_client(phone_number)
+        client = await manager.get_on_message_client(phone_number)
     elif client_type == "send_message":
-        client = await storage.get_send_message_client(phone_number)
+        client = await manager.get_send_message_client(phone_number)
 
     await client.sign_in(phone_number, phone_code_hash, auth_code)
 
@@ -144,6 +146,9 @@ async def sign_in(
             )
 
         cursor.execute(sql)
+        
+    loop = asyncio.get_event_loop()
+    loop.create_task(manager.start_client(client))
 
     return {"success": True}
 
@@ -156,7 +161,7 @@ async def create_string_1():
     phone_code_hash = payload.get("phone_code_hash")
     auth_code = payload.get("auth_code")
 
-    response = await sign_in(
+    response = await sign_in_and_start(
         phone_number, phone_code_hash, auth_code, client_type="on_message"
     )
 
@@ -171,7 +176,7 @@ async def create_string_2():
     phone_code_hash = payload.get("phone_code_hash")
     auth_code = payload.get("auth_code")
 
-    response = await sign_in(
+    response = await sign_in_and_start(
         phone_number, phone_code_hash, auth_code, client_type="send_message"
     )
 

@@ -2,12 +2,16 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,venv,virtualenv,dotenv,visualstudiocode,pycharm+all,windows,macos
 
 
+playing_around.py
+
+
 # ignore session_name.session
 *.session
 *.session-journal
 
 ### dotenv ###
 .env
+
 
 ### macOS ###
 # General
