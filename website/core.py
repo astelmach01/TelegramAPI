@@ -41,7 +41,7 @@ async def new_message(client, message):
     receiving_phone_number = client.phone_number
     time = message.date
 
-    logging.info("Got a message", msg, sender_id, time)
+    logging.info("Got a message", msg, sender_id, str(time))
 
     await send_message_to_provider(
         receiving_phone_number=receiving_phone_number,
