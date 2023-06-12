@@ -75,7 +75,7 @@ async def send_message_to_provider(
     # send a post request to url + "/channels/messages/receive
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            url + "channels/messages/receive", json=json
+            url + "api/channels/messages/receive", json=json
         ) as response:
             res = await response.json()
             logging.info("Response from Pipedrive Provider API", res)
