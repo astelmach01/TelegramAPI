@@ -37,7 +37,8 @@ async def create_and_send_code(
     )
     await client.connect()
 
-    client.add_handler(MessageHandler(new_message))
+    if client_type == "on_message":
+        client.add_handler(MessageHandler(new_message))
 
     if client_type == "on_message":
         await manager.put_on_message_client(phone_number, client)
