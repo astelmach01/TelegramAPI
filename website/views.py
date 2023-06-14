@@ -6,7 +6,7 @@ from typing import Literal
 
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
-from quart import Blueprint, request, jsonify
+from quart import Blueprint, request
 import pandas as pd
 import asyncio
 
@@ -19,7 +19,7 @@ views = Blueprint("views", __name__)
 # this is to sync up the host of this api and the provider api so the load balancer uses the same machine (session stickiness) between the two HTTP requests. This should be the first call between the provider API.
 @views.route("/sync")
 async def sync():
-    return jsonify({"status": "success"})
+    return {"status": "success"}
 
 
 async def create_and_send_code(
@@ -89,7 +89,7 @@ async def send_code_1():
         phone_number, telegram_api_id, telegram_api_hash, client_type="on_message"
     )
 
-    return jsonify(response)
+    return response
 
 
 @views.route("/send_code_2", methods=["POST"])
@@ -112,7 +112,7 @@ async def send_code_2():
         phone_number, telegram_api_id, telegram_api_hash, client_type="send_message"
     )
 
-    return jsonify(response)
+    return response
 
 
 async def sign_in_and_start(
@@ -166,7 +166,7 @@ async def create_string_1():
         phone_number, phone_code_hash, auth_code, client_type="on_message"
     )
 
-    return jsonify(response)
+    return response
 
 
 @views.route("/create_string_2", methods=["POST"])
@@ -193,4 +193,4 @@ async def create_string_2():
 
     response["pipedrive_client_id"] = pipedrive_client_id
 
-    return jsonify(response)
+    return response
