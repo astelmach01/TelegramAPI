@@ -57,6 +57,9 @@ async def send_message_to_provider(
     sender_id: str,
     conversation_id: str,
 ):
+    if msg == None or str(msg) == "None" or str(msg) == "":
+        return
+    
     logging.info("Sending message from Telegram to Pipedrive Provider API")
 
     url = settings.PIPEDRIVE_API_URL
