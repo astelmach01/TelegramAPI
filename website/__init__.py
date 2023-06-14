@@ -23,6 +23,10 @@ def create_app():
     @app.after_serving
     def close_conn():
         conn.close()
+        
+    @app.errorhandler(404)
+    async def not_found(e):
+        return "This page has not been found", 404
 
     return app
 
