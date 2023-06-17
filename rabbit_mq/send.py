@@ -86,7 +86,7 @@ class Client(BaseClient):
 client = Client(
     settings.AWS_RABBIT_MQ_USERNAME,
     settings.AWS_RABBIT_MQ_PASSWORD,
-    settings.AWS_RABBIT_MQ_BROKER_ID,
+    settings.AWS_RABBIT_MQ_HOST,
 )
 
 

@@ -75,7 +75,7 @@ class Server(BaseClient):
 server = Server(
     settings.AWS_RABBIT_MQ_USERNAME,
     settings.AWS_RABBIT_MQ_PASSWORD,
-    settings.AWS_RABBIT_MQ_BROKER_ID,
+    settings.AWS_RABBIT_MQ_HOST,
 )
 
 async def main() -> None:
