@@ -26,7 +26,7 @@ class ClientManager:
 
     async def start_client(self, client: Client):
         try:
-            await client.disconnect()   
+            await client.disconnect()
         except:
             # client was not connected in the first place, that's fine
             pass
@@ -59,11 +59,11 @@ async def send_message_to_provider(
 ):
     if msg == None or str(msg) == "None" or str(msg) == "":
         return
-    
+
     logging.info("Sending message from Telegram to Pipedrive Provider API")
 
     url = settings.PIPEDRIVE_API_URL
-    
+
     if type(time) != str:
         time = time.strftime("%Y-%m-%d %H:%M:%S")
 

@@ -53,6 +53,11 @@ class Settings(BaseSettings):
     ENVIRONMENT: str
     PORT: int
 
+    AWS_RABBIT_MQ_USERNAME: str
+    AWS_RABBIT_MQ_PASSWORD: str
+    AWS_RABBIT_MQ_HOST: str
+    AWS_RABBIT_MQ_PORT: int
+
     class Config:
         env_file = ".env"
 

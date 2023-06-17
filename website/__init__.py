@@ -3,6 +3,7 @@ import os
 
 from quart import Quart
 from .util import run_query, SQLQueryRunner, get_db
+from rabbit_mq.send import server
 
 
 conn = get_db()
@@ -15,18 +16,19 @@ def create_app():
     from .views import views
     from .auth import auth
 
-    create_database()
-
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/auth")
 
     @app.after_serving
     def close_conn():
         conn.close()
-        
+
     @app.errorhandler(404)
     async def not_found(e):
         return "This page has not been found", 404
+
+    create_database()
+    server.connect()
 
     return app
 

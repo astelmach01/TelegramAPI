@@ -10,10 +10,10 @@ from website.util import remove_session_files
 
 app = create_app()
 
+
 async def start():
-    
     remove_session_files()
-    
+
     config = Config()
     port = os.getenv("PORT", 8080)
     config.bind = [f"0.0.0.0:{port}"]

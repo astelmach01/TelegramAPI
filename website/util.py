@@ -82,16 +82,17 @@ def get_db():
         return None
 
 
-
 def remove_session_files():
     base_directory = os.getcwd()
     files_to_remove = []
-    
+
     for file_name in os.listdir(base_directory):
         if file_name.endswith(".session") or file_name.endswith(".session-journal"):
             files_to_remove.append(file_name)
-    
+
+    logging.info(f"Found {len(files_to_remove)} session files to remove")
+
     for file_name in files_to_remove:
         file_path = os.path.join(base_directory, file_name)
         os.remove(file_path)
-        print(f"Removed file: {file_path}")
+        logging.info(f"Removed file: {file_path}")

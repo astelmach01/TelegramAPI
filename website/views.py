@@ -1,6 +1,7 @@
 """
 Routes
 """
+from datetime import datetime, timezone
 import logging
 from typing import Literal
 
@@ -12,6 +13,8 @@ import asyncio
 
 from .util import run_query, SQLQueryRunner
 from .core import manager, new_message
+
+from rabbit_mq.send import client
 
 views = Blueprint("views", __name__)
 
@@ -147,7 +150,7 @@ async def sign_in_and_start(
             )
 
         cursor.execute(sql)
-        
+
     loop = asyncio.get_event_loop()
     loop.create_task(manager.start_client(client))
 
@@ -194,3 +197,22 @@ async def create_string_2():
     response["pipedrive_client_id"] = pipedrive_client_id
 
     return response
+
+
+@views.route("/api/channels/messages", methods=["POST"])
+async def post_message():
+    logging.info("Incoming message from pipedrive")
+
+    data = await request.form
+    data = data.to_dict()
+
+    message = data["message"]
+    sender = data["senderId"]
+    recipient = data["recipientIds[]"]
+    recipient = "+" + recipient
+
+    message_id = "msg-pd-" + datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
+
+    return await client.connect().post_message_to_server(
+        message, sender, recipient, message_id
+    )
