@@ -27,6 +27,7 @@ async def post_message(message, sender, recipient, message_id) -> dict:
 
 class Server(BaseClient):
     async def connect(self) -> "Server":
+        logging.info("Connecting server")
         await super()._connect()
 
         self.queue = await self.channel.declare_queue(

@@ -3,7 +3,6 @@ import os
 
 from quart import Quart
 from .util import run_query, SQLQueryRunner, get_db
-from rabbit_mq.send import client
 
 
 conn = get_db()
@@ -28,7 +27,6 @@ def create_app():
         return "This page has not been found", 404
 
     create_database()
-    client.connect()
 
     return app
 
