@@ -8,6 +8,7 @@ from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 
 from website.util import SQLQueryRunner, run_query
+from website.settings import settings
 
 class ClientManager:
     def __init__(self):
