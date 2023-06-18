@@ -15,7 +15,7 @@ app = create_app()
 
 async def start():
     remove_session_files()
-    
+
     @app.before_serving
     async def connect_rabbit_mq():
         await server.connect()

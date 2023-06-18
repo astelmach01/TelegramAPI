@@ -30,8 +30,9 @@ class Client(BaseClient):
     async def connect(self) -> "Client":
         if self.connection is not None:
             return self
-        
-        super()._connect()
+
+        logging.info("Connecting client to rabbitmq")
+        await super()._connect()
 
         self.callback_queue = await self.channel.declare_queue(
             durable=True, exclusive=True
@@ -39,7 +40,11 @@ class Client(BaseClient):
         await self.callback_queue.bind(
             self.exchange, routing_key=self.callback_queue.name
         )
+
+        logging.info("Connected client to rabbitmq")
+
         await self.callback_queue.consume(self.on_response)
+        logging.info("Client consuming messages from rabbitmq")
 
         return self
 
@@ -66,6 +71,7 @@ class Client(BaseClient):
             "message_id": message_id,
         }
 
+        logging.info(f"Client publishing message {body} to server")
         await self.exchange.publish(
             Message(
                 body=json.dumps(body).encode(),
@@ -75,8 +81,11 @@ class Client(BaseClient):
             ),
             routing_key=sender,
         )
+        logging.info(f"Client published message {body} to server")
 
+        logging.info(f"Client awaiting for response from server")
         res = await future
+        logging.info(f"Client received response {res} from server")
         return json.loads(res.decode())
 
     async def close(self):
@@ -84,9 +93,9 @@ class Client(BaseClient):
 
 
 client = Client(
-    settings.AWS_RABBIT_MQ_USERNAME,
-    settings.AWS_RABBIT_MQ_PASSWORD,
-    settings.AWS_RABBIT_MQ_HOST,
+    username=settings.AWS_RABBIT_MQ_USERNAME,
+    password=settings.AWS_RABBIT_MQ_PASSWORD,
+    broker_id=settings.AWS_RABBIT_MQ_BROKER_ID,
 )
 
 

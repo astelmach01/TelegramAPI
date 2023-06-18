@@ -27,18 +27,28 @@ async def post_message(message, sender, recipient, message_id) -> dict:
 
 class Server(BaseClient):
     async def connect(self) -> "Server":
+        logging.info("Connecting server to rabbitmq")
         await super()._connect()
+        logging.info("Connected server to rabbitmq")
 
+        queue_name = "rpc_queue"
         self.queue = await self.channel.declare_queue(
-            "rpc_queue", durable=True, exclusive=True
+            queue_name, durable=True, exclusive=True
         )
+        logging.info(f"Server declared queue {queue_name}")
         return self
 
     async def bind_queue(self, routing_key: str) -> None:
+        logging.info(
+            f"Server binding queue {self.queue.name} to routing key {routing_key}"
+        )
         await self.queue.bind(self.exchange, routing_key=routing_key)
+        logging.info(
+            f"Server bound queue {self.queue.name} to routing key {routing_key}"
+        )
 
     async def listen(self) -> None:
-        logging.info("Listening for messages")
+        logging.info("Server listening for messages")
         async with self.queue.iterator() as qiterator:
             message: AbstractIncomingMessage
             async for message in qiterator:
@@ -73,13 +83,15 @@ class Server(BaseClient):
 
 
 server = Server(
-    settings.AWS_RABBIT_MQ_USERNAME,
-    settings.AWS_RABBIT_MQ_PASSWORD,
-    settings.AWS_RABBIT_MQ_HOST,
+    username=settings.AWS_RABBIT_MQ_USERNAME,
+    password=settings.AWS_RABBIT_MQ_PASSWORD,
+    broker_id=settings.AWS_RABBIT_MQ_BROKER_ID,
 )
+
 
 async def main() -> None:
     await server.connect().listen()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

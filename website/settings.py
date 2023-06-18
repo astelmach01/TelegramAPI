@@ -55,7 +55,7 @@ class Settings(BaseSettings):
 
     AWS_RABBIT_MQ_USERNAME: str
     AWS_RABBIT_MQ_PASSWORD: str
-    AWS_RABBIT_MQ_HOST: str
+    AWS_RABBIT_MQ_BROKER_ID: str
     AWS_RABBIT_MQ_PORT: int
 
     class Config:
