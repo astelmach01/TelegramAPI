@@ -10,12 +10,12 @@ from pyrogram.handlers import MessageHandler
 from website.util import SQLQueryRunner, run_query
 from website.settings import settings
 
+backround_tasks = set()
 
 class ClientManager:
     def __init__(self):
         self.on_message_clients: dict[str, Client] = {}
         self.send_message_clients: dict[str, Client] = {}
-        self.tasks = []
 
     async def get_on_message_client(self, phone_number):
         return self.on_message_clients.get(phone_number)
@@ -72,7 +72,8 @@ class ClientManager:
 
             loop = asyncio.get_event_loop()
             task = loop.create_task(self.start_client(on_message_client))
-            self.tasks.append(task)
+            backround_tasks.add(task)
+            task.add_done_callback(lambda t: backround_tasks.remove(t))
 
             await self.put_on_message_client(phone_number, on_message_client)
             await self.put_send_message_client(phone_number, send_message_client)

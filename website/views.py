@@ -12,7 +12,7 @@ import pandas as pd
 import asyncio
 
 from .util import run_query, SQLQueryRunner
-from .core import manager, new_message
+from .core import manager, new_message, backround_tasks
 
 from rabbit_mq.send import client
 
@@ -153,7 +153,7 @@ async def sign_in_and_start(
 
     loop = asyncio.get_event_loop()
     task = loop.create_task(manager.start_client(client))
-    manager.tasks.append(task)
+    backround_tasks.add(task)
 
     return {"success": True}
 
