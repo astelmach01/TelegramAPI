@@ -14,15 +14,15 @@ from website.settings import settings
 async def post_message(message, sender, recipient, message_id) -> dict:
     client = await manager.get_on_message_client(sender)
     if client is None:
-        return {"success": False, "id": message_id}
+        return {"success": False, "data": {"id": message_id}}
 
     try:
         # the sender sent a message to us, update the chat with the message
         await client.send_message(recipient, message)
-        return {"success": True, "id": message_id}
+        return {"success": True, "data": {"id": message_id}}
     except Exception as e:
         logging.exception(e)
-        return {"success": False, "id": message_id}
+        return {"success": False, "data": {"id": message_id}}
 
 
 class Server(BaseClient):
