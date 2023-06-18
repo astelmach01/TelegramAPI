@@ -11,9 +11,9 @@ from website.core import manager
 from rabbit_mq.send import client
 from rabbit_mq.receive import server
 
+
 app = create_app()
 conn = get_db()
-
 
 async def start():
     
@@ -42,4 +42,5 @@ async def start():
 
 
 if __name__ == "__main__":
-    asyncio.run(start())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(start())

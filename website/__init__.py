@@ -3,8 +3,6 @@ import os
 
 from quart import Quart
 from .util import run_query, SQLQueryRunner, get_db
-from .core import manager
-
 
 conn = get_db()
 
