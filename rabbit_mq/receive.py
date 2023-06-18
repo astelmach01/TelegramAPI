@@ -12,7 +12,7 @@ from website.settings import settings
 
 # this is the function that handles the main logic when someone sends a message from pipedrive to us. This assumes that both the sender and recipient have installed the plugin, because we can't modify our own chat history (i.e. we can't tell telegram that a user sent a message to us)
 async def post_message(message, sender, recipient, message_id) -> dict:
-    client = await manager.get_send_message_client(sender)
+    client = await manager.get_on_message_client(sender)
     if client is None:
         return {"success": False, "id": message_id}
 
