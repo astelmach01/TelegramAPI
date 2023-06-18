@@ -65,6 +65,10 @@ class ClientManager:
                 session_string=send_message_string,
                 phone_number=phone_number,
             )
+            
+            loop = asyncio.get_event_loop()
+            task = loop.create_task(self.start_client(on_message_client))
+            self.tasks.append(task)
 
             on_message_client.add_handler(MessageHandler(new_message))
             send_message_client.add_handler(MessageHandler(new_message))
@@ -72,8 +76,7 @@ class ClientManager:
             await self.put_on_message_client(phone_number, on_message_client)
             await self.put_send_message_client(phone_number, send_message_client)
 
-            loop = asyncio.get_event_loop()
-            loop.create_task(self.start_client(on_message_client))
+            
 
             logging.info(f"Started client for {user['phone_number']}")
 

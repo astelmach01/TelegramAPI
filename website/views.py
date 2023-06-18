@@ -152,7 +152,8 @@ async def sign_in_and_start(
         cursor.execute(sql)
 
     loop = asyncio.get_event_loop()
-    loop.create_task(manager.start_client(client))
+    task = loop.create_task(manager.start_client(client))
+    manager.tasks.append(task)
 
     return {"success": True}
 
