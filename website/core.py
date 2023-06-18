@@ -76,7 +76,7 @@ class ClientManager:
         await self.stop_clients()
 
     async def stop_clients(self):
-        logging.info("Attempting to stop clients")
+        logging.info("Stopping clients")
         for client in self.on_message_clients.values():
             try:
                 await client.stop()
