@@ -9,8 +9,6 @@ from pyrogram.handlers import MessageHandler
 
 from website.util import SQLQueryRunner, run_query
 from website.settings import settings
-from rabbit_mq.receive import server
-
 
 class ClientManager:
     def __init__(self):
@@ -24,6 +22,8 @@ class ClientManager:
         return self.send_message_clients.get(phone_number)
 
     async def put_on_message_client(self, phone_number, client):
+        from rabbit_mq.receive import server
+
         await server.bind_queue(phone_number)
         self.on_message_clients[phone_number] = client
 
