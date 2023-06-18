@@ -31,7 +31,6 @@ class Client(BaseClient):
         if self.connection is not None:
             return self
         
-        logging.info("Connecting client")
         super()._connect()
 
         self.callback_queue = await self.channel.declare_queue(

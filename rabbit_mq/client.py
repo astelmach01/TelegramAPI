@@ -1,3 +1,4 @@
+import logging
 import ssl
 import aio_pika
 
@@ -21,6 +22,7 @@ class BaseClient:
         if self.connection is not None:
             return
 
+        logging.info(f"Connecting to {self.url}")
         self.connection = await aio_pika.connect(
             url=self.url, ssl_context=self.ssl_context
         )
