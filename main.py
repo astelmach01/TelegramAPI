@@ -17,6 +17,10 @@ conn = get_db()
 
 
 async def start():
+    
+    @app.errorhandler(404)
+    async def not_found(e):
+        return "This page has not been found", 404
 
     @app.before_serving
     async def connect_all_async():

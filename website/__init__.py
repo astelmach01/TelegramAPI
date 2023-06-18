@@ -19,10 +19,6 @@ def create_app():
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/auth")
 
-    @app.errorhandler(404)
-    async def not_found(e):
-        return "This page has not been found", 404
-
     create_database()
 
     return app
