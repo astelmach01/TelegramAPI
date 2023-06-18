@@ -213,6 +213,7 @@ async def post_message():
 
     message_id = "msg-pd-" + datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
 
-    return await client.connect().post_message_to_server(
+    _client = await client.connect()
+    return await _client.post_message_to_server(
         message, sender, recipient, message_id
     )
