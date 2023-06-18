@@ -33,7 +33,7 @@ async def start():
         await server.close()
         await client.close()
         await manager.close()
-
+        
     config = Config()
     port = os.getenv("PORT", 8080)
     config.bind = [f"0.0.0.0:{port}"]
