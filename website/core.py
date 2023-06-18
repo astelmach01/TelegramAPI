@@ -9,7 +9,6 @@ from pyrogram.handlers import MessageHandler
 
 from website.util import SQLQueryRunner, run_query
 
-
 class ClientManager:
     def __init__(self):
         self.on_message_clients: dict[str, Client] = {}
@@ -79,10 +78,16 @@ class ClientManager:
     async def stop_clients(self):
         logging.info("Attempting to stop clients")
         for client in self.on_message_clients.values():
-            await client.stop()
+            try:
+                await client.stop()
+            except ConnectionError:
+                pass
 
         for client in self.send_message_clients.values():
-            await client.stop()
+            try:
+                await client.stop()
+            except ConnectionError:
+                pass
             
         logging.info("Stopped clients")
 
