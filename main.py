@@ -21,10 +21,10 @@ async def start():
 
     @app.before_serving
     async def connect_all_async():
-        await manager.create_clients()
         await server.connect()
         await client.connect()
-        
+        await manager.create_clients()
+
     @app.after_serving
     async def close_conn():
         conn.close()
@@ -38,5 +38,5 @@ async def start():
     await hypercorn.asyncio.serve(app, config)
 
 
-if __name__ == "__main__":        
+if __name__ == "__main__":
     asyncio.run(start())
