@@ -79,6 +79,7 @@ class Server(BaseClient):
                     logging.exception("Processing error for message %r", message)
 
     async def close(self) -> None:
+        logging.info("Server closing connection to rabbitmq")
         await self.connection.close()
 
 

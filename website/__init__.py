@@ -3,6 +3,7 @@ import os
 
 from quart import Quart
 from .util import run_query, SQLQueryRunner, get_db
+from .core import manager
 
 
 conn = get_db()
@@ -17,10 +18,6 @@ def create_app():
 
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/auth")
-
-    @app.after_serving
-    def close_conn():
-        conn.close()
 
     @app.errorhandler(404)
     async def not_found(e):

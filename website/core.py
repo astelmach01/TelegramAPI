@@ -1,10 +1,12 @@
+import asyncio
 from datetime import datetime
 import aiohttp
 import logging
+import pandas as pd
 
 from pyrogram import Client
 
-from website.settings import settings
+from website.util import SQLQueryRunner, run_query
 
 
 class ClientManager:
@@ -32,6 +34,50 @@ class ClientManager:
             pass
         logging.info("Starting client!")
         await client.start()
+        
+    async def create_clients(self):
+        with SQLQueryRunner() as cursor:
+            sql = run_query("select_all.sql")
+            cursor.execute(sql)
+
+            result = pd.DataFrame(cursor.fetchall())
+            
+        # iterate through the rows
+        for _, user in result.iterrows():
+            logging.info(f"Creating client for {user['phone_number']}")
+            phone_number = user['phone_number']
+            on_message_string = user['on_message']
+            send_message_string = user['send_message']
+            
+            on_message_client = Client(
+                phone_number + "-" + "on_message",
+                session_string=on_message_string,
+                phone_number=phone_number,
+            )
+            
+            send_message_client = Client(
+                phone_number + "-" + "send_message",
+                session_string=send_message_string,
+                phone_number=phone_number,
+            )
+            
+            await self.put_on_message_client(phone_number, on_message_client)
+            await self.put_send_message_client(phone_number, send_message_client)
+            
+            loop = asyncio.get_event_loop()
+            loop.create_task(self.start_client(on_message_client))
+            
+            logging.info(f"Started client for {user['phone_number']}")
+                
+            
+        
+    
+    async def stop_clients(self):
+        for client in self.on_message_clients.values():
+            await client.disconnect()
+            
+        for client in self.send_message_clients.values():
+            await client.disconnect()
 
 
 async def new_message(client, message):

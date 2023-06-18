@@ -89,6 +89,7 @@ class Client(BaseClient):
         return json.loads(res.decode())
 
     async def close(self):
+        logging.info("Client closing connection to rabbitmq")
         await self.connection.close()
 
 
