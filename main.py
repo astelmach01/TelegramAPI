@@ -18,7 +18,7 @@ conn = get_db()
 
 async def start():
     loop = asyncio.get_event_loop()
-    
+
     @app.errorhandler(404)
     async def not_found(e):
         return "This page has not been found", 404
@@ -37,10 +37,10 @@ async def start():
         await server.close()
         await client.close()
         await manager.close()
-        
+
         for task in manager.tasks:
             task.cancel()
-        
+
     config = Config()
     port = os.getenv("PORT", 8080)
     config.bind = [f"0.0.0.0:{port}"]

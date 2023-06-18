@@ -202,20 +202,18 @@ async def create_string_2():
 
 @views.route("/api/channels/messages", methods=["POST"])
 async def post_message():
-
     data = await request.form
     data = data.to_dict()
 
     message = data["message"]
     # sender = data["senderId"]
-    sender = '+19735248259'
+    sender = "+19735248259"
     recipient = data["recipientIds[]"]
     recipient = "+" + recipient
 
     message_id = "msg-pd-" + datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
-    
+
     logging.info(f"Incoming message from pipedrive with params {data}")
-    
 
     _client = await client.connect()
     return await _client.post_message_to_server(message, sender, recipient, message_id)

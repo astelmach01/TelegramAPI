@@ -50,7 +50,7 @@ class Server(BaseClient):
     async def listen(self) -> None:
         if self.connection is None:
             await self.connect()
-            
+
         logging.info("Server listening for messages")
         async with self.queue.iterator() as qiterator:
             message: AbstractIncomingMessage
@@ -60,7 +60,7 @@ class Server(BaseClient):
                         assert message.reply_to is not None
 
                         body = json.loads(message.body.decode())
-                        
+
                         logging.info(f"Server received message {body}")
 
                         information = body["message"]
@@ -71,7 +71,7 @@ class Server(BaseClient):
                         response = await post_message(
                             information, sender, recipient, message_id
                         )
-                        
+
                         logging.info(f"Server sending response {response}")
 
                         await self.exchange.publish(
@@ -81,7 +81,7 @@ class Server(BaseClient):
                             ),
                             routing_key=message.reply_to,
                         )
-                        
+
                         logging.info(f"Server published response {response}")
 
                 except Exception:
@@ -89,7 +89,7 @@ class Server(BaseClient):
 
     async def start(self) -> None:
         await self.listen()
-        
+
     async def close(self) -> None:
         logging.info("Server closing connection to rabbitmq")
         await self.connection.close()

@@ -10,6 +10,7 @@ from pyrogram.handlers import MessageHandler
 from website.util import SQLQueryRunner, run_query
 from website.settings import settings
 
+
 class ClientManager:
     def __init__(self):
         self.on_message_clients: dict[str, Client] = {}
@@ -65,18 +66,16 @@ class ClientManager:
                 session_string=send_message_string,
                 phone_number=phone_number,
             )
-            
-            loop = asyncio.get_event_loop()
-            task = loop.create_task(self.start_client(on_message_client))
-            self.tasks.append(task)
 
             on_message_client.add_handler(MessageHandler(new_message))
             send_message_client.add_handler(MessageHandler(new_message))
 
+            loop = asyncio.get_event_loop()
+            task = loop.create_task(self.start_client(on_message_client))
+            self.tasks.append(task)
+
             await self.put_on_message_client(phone_number, on_message_client)
             await self.put_send_message_client(phone_number, send_message_client)
-
-            
 
             logging.info(f"Started client for {user['phone_number']}")
 
