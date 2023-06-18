@@ -57,6 +57,8 @@ class Server(BaseClient):
                         assert message.reply_to is not None
 
                         body = json.loads(message.body.decode())
+                        
+                        logging.info(f"Server received message {body}")
 
                         information = body["message"]
                         sender = body["sender"]
@@ -66,6 +68,8 @@ class Server(BaseClient):
                         response = await post_message(
                             information, sender, recipient, message_id
                         )
+                        
+                        logging.info(f"Server sending response {response}")
 
                         await self.exchange.publish(
                             Message(
@@ -74,6 +78,8 @@ class Server(BaseClient):
                             ),
                             routing_key=message.reply_to,
                         )
+                        
+                        logging.info(f"Server published response {response}")
 
                 except Exception:
                     logging.exception("Processing error for message %r", message)
