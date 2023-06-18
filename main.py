@@ -30,6 +30,7 @@ async def start():
         conn.close()
         await server.close()
         await client.close()
+        await manager.close()
 
     config = Config()
     port = os.getenv("PORT", 8080)

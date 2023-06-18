@@ -72,13 +72,19 @@ class ClientManager:
             loop.create_task(self.start_client(on_message_client))
 
             logging.info(f"Started client for {user['phone_number']}")
+            
+    async def close(self):
+        await self.stop_clients()
 
     async def stop_clients(self):
+        logging.info("Attempting to stop clients")
         for client in self.on_message_clients.values():
             await client.disconnect()
 
         for client in self.send_message_clients.values():
             await client.disconnect()
+            
+        logging.info("Stopped clients")
 
 
 async def new_message(client, message):
