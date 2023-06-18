@@ -216,4 +216,6 @@ async def post_message():
     logging.info(f"Incoming message from pipedrive with params {data}")
 
     _client = await client.connect()
-    return await _client.post_message_to_server(message, sender, recipient, message_id)
+    response = await _client.post_message_to_server(message, sender, recipient, message_id)
+    logging.info(f"Response from telegram api: {response}")
+    return response
