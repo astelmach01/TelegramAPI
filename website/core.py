@@ -14,6 +14,7 @@ class ClientManager:
     def __init__(self):
         self.on_message_clients: dict[str, Client] = {}
         self.send_message_clients: dict[str, Client] = {}
+        self.tasks = []
 
     async def get_on_message_client(self, phone_number):
         return self.on_message_clients.get(phone_number)
