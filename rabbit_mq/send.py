@@ -98,24 +98,3 @@ client = Client(
     password=settings.AWS_RABBIT_MQ_PASSWORD,
     broker_id=settings.AWS_RABBIT_MQ_BROKER_ID,
 )
-
-
-async def main() -> None:
-    client: Client = await client().connect()
-
-    args = {
-        "message": "Hello, world!",
-        "sender": "Bennett",
-        "recipient": "+19735248259",
-        "message_id": "1234",
-    }
-
-    print(f" [x] Requesting {args}")
-    response = await client.post_message_to_server(**args)
-    print(f" [.] Got {response}")
-
-    await client.close()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

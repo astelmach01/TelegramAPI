@@ -88,11 +88,3 @@ server = Server(
     password=settings.AWS_RABBIT_MQ_PASSWORD,
     broker_id=settings.AWS_RABBIT_MQ_BROKER_ID,
 )
-
-
-async def main() -> None:
-    await server.connect().listen()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

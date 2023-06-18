@@ -15,8 +15,8 @@ from rabbit_mq.receive import server
 app = create_app()
 conn = get_db()
 
+
 async def start():
-    
     @app.errorhandler(404)
     async def not_found(e):
         return "This page has not been found", 404
