@@ -48,6 +48,9 @@ class Server(BaseClient):
         )
 
     async def listen(self) -> None:
+        if self.connection is None:
+            await self.connect()
+            
         logging.info("Server listening for messages")
         async with self.queue.iterator() as qiterator:
             message: AbstractIncomingMessage
@@ -84,6 +87,9 @@ class Server(BaseClient):
                 except Exception:
                     logging.exception("Processing error for message %r", message)
 
+    async def start(self) -> None:
+        await self.listen()
+        
     async def close(self) -> None:
         logging.info("Server closing connection to rabbitmq")
         await self.connection.close()

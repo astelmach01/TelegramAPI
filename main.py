@@ -23,7 +23,7 @@ async def start():
 
     @app.before_serving
     async def connect_all_async():
-        await server.connect()
+        await server.start()
         await client.connect()
         await manager.create_clients()
 
