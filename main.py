@@ -7,7 +7,7 @@ import hypercorn.asyncio
 import pandas as pd
 
 from website import create_app
-from website.util import remove_session_files, get_db
+from website.util import get_db
 from website.core import manager
 from rabbit_mq.send import client
 from rabbit_mq.receive import server

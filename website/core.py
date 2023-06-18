@@ -79,10 +79,10 @@ class ClientManager:
     async def stop_clients(self):
         logging.info("Attempting to stop clients")
         for client in self.on_message_clients.values():
-            await client.disconnect()
+            await client.stop()
 
         for client in self.send_message_clients.values():
-            await client.disconnect()
+            await client.stop()
             
         logging.info("Stopped clients")
 
