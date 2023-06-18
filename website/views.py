@@ -206,8 +206,7 @@ async def post_message():
     data = data.to_dict()
 
     message = data["message"]
-    # sender = data["senderId"]
-    sender = "+19735248259"
+    sender = data["senderId"]
     recipient = data["recipientIds[]"]
     recipient = "+" + recipient
 
