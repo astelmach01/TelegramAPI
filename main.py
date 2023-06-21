@@ -18,7 +18,9 @@ app = create_app()
 conn = get_db()
 
 async def print_manager_stats():
-    await manager.report()
+    while True:
+        await asyncio.sleep(5 * 60)
+        await manager.report()
     
 async def start():
     logging.info("Starting server")
