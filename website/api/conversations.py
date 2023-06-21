@@ -129,7 +129,7 @@ async def get_conversations(body: dict):
 
 @conversations_route.route("/getConversations")
 async def get_conversations_route():
-    body = await request.json()
+    body = await request.get_json()
 
     body["function"] = "getConversations"
     body["routing_key"] = body["sender"]
