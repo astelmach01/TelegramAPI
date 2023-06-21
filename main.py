@@ -6,7 +6,7 @@ from hypercorn.config import Config
 import hypercorn.asyncio
 
 from website import create_app
-from website.util import get_db
+from website.util import get_db, remove_session_files
 from website.core import manager, backround_tasks
 from rabbit_mq.send import rpc_client
 from rabbit_mq.receive import server
@@ -25,6 +25,7 @@ async def start():
 
     @app.before_serving
     async def connect_all_async():
+        remove_session_files()
         await server.connect()
         await rpc_client.connect()
         await manager.create_clients()
