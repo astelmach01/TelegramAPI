@@ -21,19 +21,17 @@ async def print_manager_stats():
     await manager.report()
     
 async def start():
-    loop = asyncio.get_event_loop()
-    
-    scheduler = AsyncIOScheduler(loop)
-    job = scheduler.add_job(print_manager_stats, 'interval', minutes=30)
-    scheduler.start()
-
     logging.info("Starting server")
+    
+    loop = asyncio.get_event_loop()
+
     @app.errorhandler(404)
     async def not_found(e):
         return "This page has not been found", 404
 
     @app.before_serving
     async def connect_all_async():
+        
         remove_session_files()
         await server.connect()
         await rpc_client.connect()
@@ -50,11 +48,13 @@ async def start():
 
         for task in backround_tasks:
             task.cancel()
+            
+    app.add_background_task(print_manager_stats)
 
     config = Config()
     port = os.getenv("PORT", 8080)
     config.bind = [f"0.0.0.0:{port}"]
-
+    
     await hypercorn.asyncio.serve(app, config)
 
 
