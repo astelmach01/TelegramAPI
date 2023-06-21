@@ -133,7 +133,7 @@ async def sign_in_and_start(
         client = await manager.get_send_message_client(phone_number)
 
     await client.sign_in(phone_number, phone_code_hash, auth_code)
-    
+
     me = await client.get_me()
     await manager.put_client_by_id(me.id, client)
 
@@ -210,6 +210,3 @@ async def create_string_2():
     response["pipedrive_client_id"] = pipedrive_client_id
 
     return response
-
-
-

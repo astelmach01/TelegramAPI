@@ -82,7 +82,6 @@ def get_db():
         return None
 
 
-
 def remove_session_files():
     base_directory = os.getcwd()
     files_to_remove = []

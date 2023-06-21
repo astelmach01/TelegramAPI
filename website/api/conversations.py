@@ -9,6 +9,7 @@ from rabbit_mq.send import rpc_client
 
 conversations_route = Blueprint("conversations", __name__)
 
+
 def get_name(user):
     return (
         f"{user.first_name} {user.last_name}"
@@ -73,25 +74,25 @@ async def get_conversation_by_id(body: dict):
             "after": "c-next",
         },
     }
-    
-    
+
+
 @conversations_route.route("/getConversationById")
 async def get_conversation_by_id_route(body: dict):
-    body['function'] = 'getConversationById'
-    body['routing_key'] = body['sender']
-    
+    body["function"] = "getConversationById"
+    body["routing_key"] = body["sender"]
+
     _rpc_client = await rpc_client.connect()
     response = await _rpc_client.post_message_to_server(body)
 
     logging.info(f"Response from telegram api: {response}")
     return response
 
-    
+
 async def get_conversations(body: dict):
     sender = body["sender"]
     conversations_limit = body.get("conversations_limit")
     messages_limit = body.get("messages_limit")
-    
+
     conversations = []
     client = await manager.get_client_by_id(sender)
 
@@ -129,16 +130,14 @@ async def get_conversations(body: dict):
 @conversations_route.route("/getConversations")
 async def get_conversations_route():
     body = await request.json()
-    
-    body['function'] = 'getConversations'
-    body['routing_key'] = body['sender']
-    body['conversations_limit'] = body.get("conversations_limit", 30)
-    body['messages_limit'] = body.get("messages_limit", 30)
-    
+
+    body["function"] = "getConversations"
+    body["routing_key"] = body["sender"]
+    body["conversations_limit"] = body.get("conversations_limit", 30)
+    body["messages_limit"] = body.get("messages_limit", 30)
+
     _rpc_client = await rpc_client.connect()
     response = await _rpc_client.post_message_to_server(body)
 
     logging.info(f"Response from telegram api: {response}")
     return response
-        
-    

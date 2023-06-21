@@ -59,7 +59,7 @@ async def formatted_messages_by_convo_id(
 async def post_message():
     data = await request.form
     data = data.to_dict()
-    
+
     function = "post_message"
     recipient = data["recipientIds[]"]
 

@@ -17,14 +17,16 @@ class ClientManager:
     def __init__(self):
         self.on_message_clients: dict[str, Client] = {}
         self.send_message_clients: dict[str, Client] = {}
-        self.id_to_client: dict[str, Client] = {} # the sender id used in get and post requests
+        self.id_to_client: dict[
+            str, Client
+        ] = {}  # the sender id used in get and post requests
 
     async def get_on_message_client(self, phone_number):
         return self.on_message_clients.get(phone_number)
 
     async def get_send_message_client(self, phone_number):
         return self.send_message_clients.get(phone_number)
-    
+
     async def get_client_by_id(self, sender_id):
         return self.id_to_client.get(sender_id)
 
@@ -36,7 +38,7 @@ class ClientManager:
 
     async def put_send_message_client(self, phone_number, client):
         self.send_message_clients[phone_number] = client
-        
+
     async def put_client_by_id(self, sender_id, client):
         self.id_to_client[sender_id] = client
 
