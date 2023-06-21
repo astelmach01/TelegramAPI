@@ -108,6 +108,16 @@ class ClientManager:
                 pass
 
         logging.info("Stopped clients")
+        
+    async def report(self):
+        string = "On message clients: \n"
+        string += str(self.on_message_clients)
+        string += "\n\nSend message clients: \n"
+        string += str(self.send_message_clients)
+        string += "\n\nId to client: \n"
+        string += str(self.id_to_client)
+        
+        logging.info(string)
 
 
 async def new_message(client, message):

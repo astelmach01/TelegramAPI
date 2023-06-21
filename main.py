@@ -1,9 +1,11 @@
 import asyncio
+import logging
 import os
 
 import hypercorn
 from hypercorn.config import Config
 import hypercorn.asyncio
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from website import create_app
 from website.util import get_db, remove_session_files
@@ -15,10 +17,17 @@ from rabbit_mq.receive import server
 app = create_app()
 conn = get_db()
 
-
+async def print_manager_stats():
+    await manager.report()
+    
 async def start():
     loop = asyncio.get_event_loop()
+    
+    scheduler = AsyncIOScheduler(loop)
+    job = scheduler.add_job(print_manager_stats, 'interval', minutes=30)
+    scheduler.start()
 
+    logging.info("Starting server")
     @app.errorhandler(404)
     async def not_found(e):
         return "This page has not been found", 404
