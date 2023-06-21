@@ -15,6 +15,7 @@ from rabbit_mq.receive import server
 
 
 app = create_app()
+
 conn = get_db()
 
 async def print_manager_stats():
@@ -26,6 +27,8 @@ async def start():
     logging.info("Starting server")
     
     loop = asyncio.get_event_loop()
+    
+    await app.app_context().push()
 
     @app.errorhandler(404)
     async def not_found(e):
