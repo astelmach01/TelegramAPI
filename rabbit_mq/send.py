@@ -34,8 +34,9 @@ class Client(BaseClient):
         logging.info("Connecting client to rabbitmq")
         await super()._connect()
 
+        # replace number queue with db call
         self.callback_queue = await self.channel.declare_queue(
-            durable=True, exclusive=True
+            "callback_queue_1", durable=True, exclusive=True
         )
         await self.callback_queue.bind(
             self.exchange, routing_key=self.callback_queue.name
@@ -44,6 +45,7 @@ class Client(BaseClient):
         logging.info("Connected client to rabbitmq")
 
         await self.callback_queue.consume(self.on_response)
+
         logging.info("Client consuming messages from rabbitmq")
 
         return self
@@ -56,20 +58,12 @@ class Client(BaseClient):
         future: asyncio.Future = self.futures.pop(message.correlation_id)
         future.set_result(message.body)
 
-    async def post_message_to_server(
-        self, message, sender: str, recipient: str, message_id: str
-    ) -> dict:
+    async def post_message_to_server(self, body: dict) -> dict:
         correlation_id = str(uuid.uuid4())
+        routing_key = body["routing_key"]
 
         future = self.loop.create_future()
         self.futures[correlation_id] = future
-
-        body = {
-            "message": message,
-            "sender": sender,
-            "recipient": recipient,
-            "message_id": message_id,
-        }
 
         logging.info(f"Client publishing message {body} to server")
         await self.exchange.publish(
@@ -79,7 +73,7 @@ class Client(BaseClient):
                 correlation_id=correlation_id,
                 reply_to=self.callback_queue.name,
             ),
-            routing_key=sender,
+            routing_key=routing_key,
         )
         logging.info(f"Client published message {body} to server")
 
@@ -93,7 +87,7 @@ class Client(BaseClient):
         await self.connection.close()
 
 
-client = Client(
+rpc_client = Client(
     username=settings.AWS_RABBIT_MQ_USERNAME,
     password=settings.AWS_RABBIT_MQ_PASSWORD,
     broker_id=settings.AWS_RABBIT_MQ_BROKER_ID,

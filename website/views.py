@@ -1,7 +1,6 @@
 """
 Routes
 """
-from datetime import datetime, timezone
 import logging
 from typing import Literal
 
@@ -14,7 +13,6 @@ import asyncio
 from .util import run_query, SQLQueryRunner
 from .core import manager, new_message, backround_tasks
 
-from rabbit_mq.send import client
 
 views = Blueprint("views", __name__)
 
@@ -70,6 +68,9 @@ async def send_code_1():
     payload = await request.get_json()
 
     phone_number = payload.get("phone_number")
+    if phone_number[0] != "+":
+        phone_number = "+" + phone_number
+
     telegram_api_id = payload.get("telegram_api_id")
     telegram_api_hash = payload.get("telegram_api_hash")
     pipedrive_client_id = payload.get("pipedrive_client_id")
@@ -100,6 +101,8 @@ async def send_code_2():
     payload = await request.get_json()
 
     phone_number = payload.get("phone_number")
+    if phone_number[0] != "+":
+        phone_number = "+" + phone_number
 
     with SQLQueryRunner() as cursor:
         logging.info("Selecting phone number")
@@ -130,6 +133,9 @@ async def sign_in_and_start(
         client = await manager.get_send_message_client(phone_number)
 
     await client.sign_in(phone_number, phone_code_hash, auth_code)
+    
+    me = await client.get_me()
+    await manager.put_client_by_id(me.id, client)
 
     session_string = await client.export_session_string()
 
@@ -163,6 +169,9 @@ async def create_string_1():
     payload = await request.get_json()
 
     phone_number = payload.get("phone_number")
+    if phone_number[0] != "+":
+        phone_number = "+" + phone_number
+
     phone_code_hash = payload.get("phone_code_hash")
     auth_code = payload.get("auth_code")
 
@@ -178,6 +187,9 @@ async def create_string_2():
     payload = await request.get_json()
 
     phone_number = payload.get("phone_number")
+    if phone_number[0] != "+":
+        phone_number = "+" + phone_number
+
     phone_code_hash = payload.get("phone_code_hash")
     auth_code = payload.get("auth_code")
 
@@ -200,21 +212,4 @@ async def create_string_2():
     return response
 
 
-@views.route("/api/channels/messages", methods=["POST"])
-async def post_message():
-    data = await request.form
-    data = data.to_dict()
 
-    message = data["message"]
-    sender = data["senderId"]
-    recipient = data["recipientIds[]"]
-    recipient = "+" + recipient
-
-    message_id = "msg-pd-" + datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
-
-    logging.info(f"Incoming message from pipedrive with params {data}")
-
-    _client = await client.connect()
-    response = await _client.post_message_to_server(message, sender, recipient, message_id)
-    logging.info(f"Response from telegram api: {response}")
-    return response

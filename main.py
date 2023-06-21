@@ -8,7 +8,7 @@ import hypercorn.asyncio
 from website import create_app
 from website.util import get_db
 from website.core import manager, backround_tasks
-from rabbit_mq.send import client
+from rabbit_mq.send import rpc_client
 from rabbit_mq.receive import server
 
 
@@ -26,7 +26,7 @@ async def start():
     @app.before_serving
     async def connect_all_async():
         await server.connect()
-        await client.connect()
+        await rpc_client.connect()
         await manager.create_clients()
         task = loop.create_task(server.start())
         backround_tasks.add(task)
@@ -35,7 +35,7 @@ async def start():
     async def close_conn():
         conn.close()
         await server.close()
-        await client.close()
+        await rpc_client.close()
         await manager.close()
 
         for task in backround_tasks:

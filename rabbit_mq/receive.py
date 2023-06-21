@@ -1,28 +1,12 @@
-import asyncio
 import json
 import logging
 
 from aio_pika import Message
 from aio_pika.abc import AbstractIncomingMessage
+from rabbit_mq.functions import functions
 from rabbit_mq.client import BaseClient
 
-from website.core import manager
 from website.settings import settings
-
-
-# this is the function that handles the main logic when someone sends a message from pipedrive to us. This assumes that both the sender and recipient have installed the plugin, because we can't modify our own chat history (i.e. we can't tell telegram that a user sent a message to us)
-async def post_message(message, sender, recipient, message_id) -> dict:
-    client = await manager.get_on_message_client(sender)
-    if client is None:
-        return {"success": False, "data": {"id": message_id}}
-
-    try:
-        # the sender sent a message to us, update the chat with the message
-        await client.send_message(recipient, message)
-        return {"success": True, "data": {"id": message_id}}
-    except Exception as e:
-        logging.exception(e)
-        return {"success": False, "data": {"id": message_id}}
 
 
 class Server(BaseClient):
@@ -31,7 +15,7 @@ class Server(BaseClient):
         await super()._connect()
         logging.info("Connected server to rabbitmq")
 
-        queue_name = "rpc_queue"
+        queue_name = "rpc_queue_1"  # change this to multiple queues
         self.queue = await self.channel.declare_queue(
             queue_name, durable=True, exclusive=True
         )
@@ -39,9 +23,6 @@ class Server(BaseClient):
         return self
 
     async def bind_queue(self, routing_key: str) -> None:
-        logging.info(
-            f"Server binding queue {self.queue.name} to routing key {routing_key}"
-        )
         await self.queue.bind(self.exchange, routing_key=routing_key)
         logging.info(
             f"Server bound queue {self.queue.name} to routing key {routing_key}"
@@ -63,14 +44,9 @@ class Server(BaseClient):
 
                         logging.info(f"Server received message {body}")
 
-                        information = body["message"]
-                        sender = body["sender"]
-                        recipient = body["recipient"]
-                        message_id = body["message_id"]
+                        func = functions[body["function"]]
 
-                        response = await post_message(
-                            information, sender, recipient, message_id
-                        )
+                        response = await func(body)
 
                         logging.info(f"Server sending response {response}")
 
@@ -88,6 +64,7 @@ class Server(BaseClient):
                     logging.exception("Processing error for message %r", message)
 
     async def start(self) -> None:
+        logging.info("Server listening for messages")
         await self.listen()
 
     async def close(self) -> None:

@@ -13,9 +13,13 @@ def create_app():
 
     from .views import views
     from .auth import auth
+    from .api.messages import messages_route
+    from .api.conversations import conversations_route
 
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/auth")
+    app.register_blueprint(messages_route, url_prefix="/api/messages")
+    app.register_blueprint(conversations_route, url_prefix="/api/conversations")
 
     create_database()
 
