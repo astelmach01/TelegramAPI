@@ -26,6 +26,7 @@ def create_app():
     return app
 
 
+
 def create_database():
     logging.info("Creating session table")
 
