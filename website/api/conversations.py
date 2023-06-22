@@ -1,5 +1,6 @@
 import logging
 from pyrogram.enums import ChatType
+from pyrogram.types import User
 from pyrogram import Client
 from quart import Blueprint, request
 
@@ -18,9 +19,8 @@ def get_name(user):
     )
 
 
-async def formatted_participants_by_convo_id(client: Client, conversation_id: str):
+async def formatted_participants_by_convo_id(client: Client, conversation_id: str, me: User):
     conversation = await client.get_chat(conversation_id)
-    me = await client.get_me()
 
     if conversation.type != ChatType.PRIVATE:
         return []
@@ -96,6 +96,7 @@ async def get_conversations(body: dict):
 
     conversations = []
     client = await manager.get_on_message_client(sender)
+    me = await client.get_me()
     
     logging.info(f"Getting conversations with params {body} and client {client}")
     
@@ -109,7 +110,7 @@ async def get_conversations(body: dict):
         messages = await formatted_messages_by_convo_id(
             client, convo_id, messages_limit
         )
-        participants = await formatted_participants_by_convo_id(client, convo_id)
+        participants = await formatted_participants_by_convo_id(client, convo_id, me)
 
         conversations.append(
             {
