@@ -78,7 +78,8 @@ class Client(BaseClient):
         logging.info(f"Client published message {body} to server")
 
         logging.info(f"Client awaiting for response from server")
-        res = await future
+        # wait for a maximum of 10 seconds
+        res = await asyncio.wait_for(future, timeout=10)
         logging.info(f"Client received response {res} from server")
         return json.loads(res.decode())
 
