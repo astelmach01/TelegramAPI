@@ -89,7 +89,6 @@ async def get_conversation_by_id_route(body: dict):
 
 
 async def get_conversations(body: dict):
-    logging.info(f"Getting conversations with params {body}")
     sender = body["sender"]
     conversations_limit = body.get("conversations_limit")
     messages_limit = body.get("messages_limit")
@@ -97,6 +96,9 @@ async def get_conversations(body: dict):
 
     conversations = []
     client = await manager.get_client_by_id(sender)
+    
+    logging.info(f"Getting conversations with params {body} and client {client}")
+    
 
     async for conversation in client.get_dialogs(limit=conversations_limit):
         # only supporting private chats for now, group chat support will be added later

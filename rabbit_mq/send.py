@@ -75,9 +75,8 @@ class Client(BaseClient):
             ),
             routing_key=routing_key,
         )
-        logging.info(f"Client published message {body} to server")
+        logging.info(f"Client published message {body} to server, awaiting response")
 
-        logging.info(f"Client awaiting for response from server")
         # wait for a maximum of 10 seconds
         res = await asyncio.wait_for(future, timeout=10)
         logging.info(f"Client received response {res} from server")
