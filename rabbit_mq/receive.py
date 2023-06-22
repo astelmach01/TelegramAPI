@@ -60,8 +60,8 @@ class Server(BaseClient):
 
                         logging.info(f"Server published response {response}")
 
-                except Exception:
-                    logging.exception("Processing error for message %r", message)
+                except Exception as e:
+                    logging.exception(f"Server error processing message {e}")
 
     async def start(self) -> None:
         logging.info("Server listening for messages")

@@ -89,9 +89,11 @@ async def get_conversation_by_id_route(body: dict):
 
 
 async def get_conversations(body: dict):
+    logging.info(f"Getting conversations with params {body}")
     sender = body["sender"]
     conversations_limit = body.get("conversations_limit")
     messages_limit = body.get("messages_limit")
+
 
     conversations = []
     client = await manager.get_client_by_id(sender)
