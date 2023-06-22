@@ -95,7 +95,7 @@ async def get_conversations(body: dict):
 
 
     conversations = []
-    client = await manager.on_message_clients(sender)
+    client = await manager.get_on_message_client(sender)
     
     logging.info(f"Getting conversations with params {body} and client {client}")
     
