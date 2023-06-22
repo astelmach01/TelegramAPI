@@ -37,7 +37,7 @@ class Server(BaseClient):
             message: AbstractIncomingMessage
             async for message in qiterator:
                 try:
-                    async with message.process(requeue=False):
+                    async with message.process():
                         assert message.reply_to is not None
 
                         body = json.loads(message.body.decode())
