@@ -38,7 +38,7 @@ async def formatted_participants_by_convo_id(
             # the user we are talking to
             "id": str(conversation.id),
             "name": person_talking_to_name,
-            "role": "source_user",
+            "role": "end_user",
             "avatar_url": "https://gravatar.com/avatar/46bc577a4533b8d3142db0bbdf28b26d?s=400&d=robohash&r=x",
             "fetch_avatar": True,
             "avatar_expires": False,
@@ -158,6 +158,7 @@ async def get_conversations(body: dict):
         conversations.append(
             {
                 "id": convo_id,
+                "link": "https://google.com",
                 "status": "open",
                 "seen": conversation.unread_messages_count == 0,
                 "next_messages_cursor": None,
@@ -165,7 +166,7 @@ async def get_conversations(body: dict):
                 "participants": participants,
             }
         )
-    
+
     return {
         "success": True,
         "data": conversations,
