@@ -108,7 +108,7 @@ class ClientManager:
                 pass
 
         logging.info("Stopped clients")
-        
+
     async def report(self):
         string = "On message clients: \n"
         string += str(self.on_message_clients)
@@ -116,7 +116,7 @@ class ClientManager:
         string += str(self.send_message_clients)
         string += "\n\nId to client: \n"
         string += str(self.id_to_client)
-        
+
         logging.info(string)
 
 
@@ -151,7 +151,7 @@ async def send_message_to_provider(
     url = settings.PIPEDRIVE_API_URL
 
     if type(time) != str:
-        time = time.strftime("%Y-%m-%d %H:%M:%S")
+        time = time.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     json = {
         "msg": msg,

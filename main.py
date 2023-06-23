@@ -18,16 +18,18 @@ app = create_app()
 
 conn = get_db()
 
+
 async def print_manager_stats():
     while True:
         await asyncio.sleep(5 * 60)
         await manager.report()
-    
+
+
 async def start():
     logging.info("Starting server")
-    
+
     loop = asyncio.get_event_loop()
-    
+
     await app.app_context().push()
 
     @app.errorhandler(404)
@@ -36,7 +38,6 @@ async def start():
 
     @app.before_serving
     async def connect_all_async():
-        
         remove_session_files()
         await server.connect()
         await rpc_client.connect()
@@ -53,13 +54,13 @@ async def start():
 
         for task in backround_tasks:
             task.cancel()
-            
+
     app.add_background_task(print_manager_stats)
 
     config = Config()
     port = os.getenv("PORT", 8080)
     config.bind = [f"0.0.0.0:{port}"]
-    
+
     await hypercorn.asyncio.serve(app, config)
 
 

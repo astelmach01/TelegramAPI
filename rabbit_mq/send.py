@@ -57,7 +57,7 @@ class Client(BaseClient):
 
         future: asyncio.Future = self.futures.pop(message.correlation_id)
         future.set_result(message.body)
-        
+
         await message.ack()
 
     async def post_message_to_server(self, body: dict) -> dict:
@@ -79,7 +79,7 @@ class Client(BaseClient):
         )
         logging.info(f"Client published message {body} to server, awaiting response")
 
-        res = await future 
+        res = await future
         logging.info(f"Client received response {res} from server")
         return json.loads(res.decode())
 

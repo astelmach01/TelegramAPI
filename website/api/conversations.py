@@ -19,7 +19,9 @@ def get_name(user):
     )
 
 
-async def formatted_participants_by_convo_id(client: Client, conversation_id: str, me: User):
+async def formatted_participants_by_convo_id(
+    client: Client, conversation_id: str, me: User
+):
     conversation = await client.get_chat(conversation_id)
 
     if conversation.type != ChatType.PRIVATE:
@@ -94,13 +96,11 @@ async def get_conversations(body: dict):
     conversations_limit = body.get("conversations_limit")
     messages_limit = body.get("messages_limit")
 
-
     conversations = []
     client = await manager.get_on_message_client(sender)
     me = await client.get_me()
-    
+
     logging.info(f"Getting conversations with params {body} and client {client}")
-    
 
     async for conversation in client.get_dialogs(limit=conversations_limit):
         # only supporting private chats for now, group chat support will be added later
@@ -141,8 +141,8 @@ async def get_conversations_route():
     body["routing_key"] = body["sender"]
     # body["conversations_limit"] = body.get("conversations_limit", 30)
     # body["messages_limit"] = body.get("messages_limit", 30)
-    body['conversations_limit'] = 1
-    body['messages_limit'] = 1
+    body["conversations_limit"] = 1
+    body["messages_limit"] = 1
 
     _rpc_client = await rpc_client.connect()
     response = await _rpc_client.post_message_to_server(body)

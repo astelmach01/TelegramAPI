@@ -41,11 +41,11 @@ async def formatted_messages_by_convo_id(
         formatted = {
             "id": str(message.id),
             "status": "sent",
-            "created_at": message.date.strftime("%Y-%m-%d %H:%M:%S"),
+            "created_at": message.date.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
             "message": message.text or "",
             "sender_id": str(message.from_user.id),
             "reply_by": (message.date + timedelta(days=365)).strftime(
-                "%Y-%m-%d %H:%M:%S"
+                "%Y-%m-%dT%H:%M:%S.%fZ"
             ),
             "attachments": [],
         }
@@ -66,7 +66,9 @@ async def post_message():
     if recipient[0] != "+":
         recipient = "+" + recipient
 
-    message_id = "msg-pd-" + datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
+    message_id = "msg-pd-" + datetime.now(timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%S.%fZ"
+    )
 
     body = {
         "function": function,
