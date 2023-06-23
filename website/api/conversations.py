@@ -34,7 +34,6 @@ async def formatted_participants_by_convo_id(
     me_name = me_name or me.username
 
     return [
-        
         {
             # the user we are talking to
             "id": str(conversation.id),
@@ -149,7 +148,7 @@ async def get_conversations_route():
 
     body["function"] = "getConversations"
     body["routing_key"] = body["sender"]
-    body["conversations_limit"] = 10 #body.get("conversations_limit", 30)
+    body["conversations_limit"] = 14 #body.get("conversations_limit", 30)
     body["messages_limit"] = body.get("messages_limit", 30)
 
     _rpc_client = await rpc_client.connect()
