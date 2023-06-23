@@ -42,7 +42,7 @@ async def formatted_participants_by_convo_id(client: Client, conversation_id: st
             # us
             "id": str(me.id),
             "name": me_name,
-            "role": "end_user",
+            "role": "source_user",
         },
     ]
 
@@ -69,6 +69,7 @@ async def get_conversation_by_id(body: dict):
             "next_messages_cursor": None,
             "messages": messages,
             "participants": participants,
+            "link": f"https://google.com",
         },
         "additional_data": {
             "after": "c-next",
