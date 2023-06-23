@@ -39,12 +39,14 @@ async def formatted_participants_by_convo_id(
             "id": str(conversation.id),
             "name": person_talking_to_name,
             "role": "source_user",
+            "avatar_url": 'https://gravatar.com/avatar/2eb4c1887fa17ea75944707163aebeb9?s=400&d=robohash&r=x'
         },
         {
             # us
             "id": str(me.id),
             "name": me_name,
             "role": "source_user",
+            "avatar_url": 'https://gravatar.com/avatar/2eb4c1887fa17ea75944707163aebeb9?s=400&d=robohash&r=x'
         },
     ]
 
