@@ -94,6 +94,15 @@ async def get_conversation_by_id_route(body: dict):
 
 
 async def get_conversations(body: dict):
+    
+    return {
+        "success": True,
+        "data": [],
+        "additional_data": {
+            "after": "c-next",
+        },
+    }
+    
     sender = body["sender"]
     conversations_limit = body.get("conversations_limit")
     messages_limit = body.get("messages_limit")
@@ -127,13 +136,7 @@ async def get_conversations(body: dict):
             }
         )
 
-    return {
-        "success": True,
-        "data": conversations,
-        "additional_data": {
-            "after": "c-next",
-        },
-    }
+    
 
 
 @conversations_route.route("/getConversations")
