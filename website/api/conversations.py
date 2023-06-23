@@ -149,10 +149,9 @@ async def get_conversations(body: dict):
             continue
 
         convo_id = str(conversation.chat.id)
-        # messages = await formatted_messages_by_convo_id(
-        #     client, convo_id, messages_limit
-        # )
-        messages = []
+        messages = await formatted_messages_by_convo_id(
+            client, convo_id, messages_limit
+        )
         participants = await formatted_participants_by_convo_id(client, convo_id, me)
 
         conversations.append(
