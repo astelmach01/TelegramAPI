@@ -60,7 +60,7 @@ async def get_conversation_by_id(body: dict):
     conversation_id = body["conversation_id"]
     messages_limit = body.get("messages_limit")
 
-    client = await manager.get_client_by_id(sender)
+    client = await manager.get_on_message_client(sender)
 
     conversation = await client.get_chat(conversation_id)
     messages = await formatted_messages_by_convo_id(
