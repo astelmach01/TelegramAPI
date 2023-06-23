@@ -96,32 +96,34 @@ async def get_conversation_by_id_route(body: dict):
 async def get_conversations(body: dict):
     return {
         "success": True,
-        "data": {
-            "id": "dfgjhflgkjsjlgfk",
-            "link": "https://google.com",
-            "status": "open",
-            "seen": False,
-            "next_messages_cursor": None,
-            "messages": [],
-            "participants": [
-                {
-                    "id": "sender-pd-1",
-                    "name": "Pipedriver Test User",
-                    "role": "source_user",
-                    "avatar_url": "hhttps://gravatar.com/avatar/46bc577a4533b8d3142db0bbdf28b26d?s=400&d=robohash&r=x",
-                    "fetch_avatar": True,
-                    "avatar_expires": False,
-                },
-                {
-                    "id": "Sender 2",
-                    "name": "Pipedriver Test User 2",
-                    "role": "end_user",
-                    "avatar_url": "https://gravatar.com/avatar/46bc577a4533b8d3142db0bbdf28b26d?s=400&d=robohash&r=x",
-                    "fetch_avatar": True,
-                    "avatar_expires": False,
-                },
-            ],
-        },
+        "data": [
+            {
+                "id": "dfgjhflgkjsjlgfk",
+                "link": "https://google.com",
+                "status": "open",
+                "seen": False,
+                "next_messages_cursor": None,
+                "messages": [],
+                "participants": [
+                    {
+                        "id": "sender-pd-1",
+                        "name": "Pipedriver Test User",
+                        "role": "source_user",
+                        "avatar_url": "hhttps://gravatar.com/avatar/46bc577a4533b8d3142db0bbdf28b26d?s=400&d=robohash&r=x",
+                        "fetch_avatar": True,
+                        "avatar_expires": False,
+                    },
+                    {
+                        "id": "Sender 2",
+                        "name": "Pipedriver Test User 2",
+                        "role": "end_user",
+                        "avatar_url": "https://gravatar.com/avatar/46bc577a4533b8d3142db0bbdf28b26d?s=400&d=robohash&r=x",
+                        "fetch_avatar": True,
+                        "avatar_expires": False,
+                    },
+                ],
+            }
+        ],
         "additional_data": {
             "after": "c-next",
         },
