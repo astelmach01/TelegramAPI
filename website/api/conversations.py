@@ -34,20 +34,21 @@ async def formatted_participants_by_convo_id(
     me_name = me_name or me.username
 
     return [
-        {
-            # us
-            "id": str(me.id),
-            "name": me_name,
-            "role": "source_user",
-            "avatar_url": "https://gravatar.com/avatar/46bc577a4533b8d3142db0bbdf28b26d?s=400&d=robohash&r=x",
-            "fetch_avatar": True,
-            "avatar_expires": False,
-        },
+        
         {
             # the user we are talking to
             "id": str(conversation.id),
             "name": person_talking_to_name,
             "role": "end_user",
+            "avatar_url": "https://gravatar.com/avatar/46bc577a4533b8d3142db0bbdf28b26d?s=400&d=robohash&r=x",
+            "fetch_avatar": True,
+            "avatar_expires": False,
+        },
+        {
+            # us
+            "id": str(me.id),
+            "name": me_name,
+            "role": "source_user",
             "avatar_url": "https://gravatar.com/avatar/46bc577a4533b8d3142db0bbdf28b26d?s=400&d=robohash&r=x",
             "fetch_avatar": True,
             "avatar_expires": False,
