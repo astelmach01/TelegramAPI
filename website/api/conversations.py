@@ -98,40 +98,6 @@ async def get_conversation_by_id_route(body: dict):
 
 
 async def get_conversations(body: dict):
-    # return {
-    #     "success": True,
-    #     "data": [
-    #         {
-    #             "id": "dfgjhflgkjsjlgfk",
-    #             "link": "https://google.com",
-    #             "status": "open",
-    #             "seen": False,
-    #             "next_messages_cursor": None,
-    #             "messages": [],
-    #             "participants": [
-    #                 {
-    #                     "id": "sender-pd-1",
-    #                     "name": "Pipedriver Test User",
-    #                     "role": "source_user",
-    #                     "avatar_url": "https://gravatar.com/avatar/46bc577a4533b8d3142db0bbdf28b26d?s=400&d=robohash&r=x",
-    #                     "fetch_avatar": True,
-    #                     "avatar_expires": False,
-    #                 },
-    #                 {
-    #                     "id": "Sender 2",
-    #                     "name": "Pipedriver Test User 2",
-    #                     "role": "end_user",
-    #                     "avatar_url": "https://gravatar.com/avatar/46bc577a4533b8d3142db0bbdf28b26d?s=400&d=robohash&r=x",
-    #                     "fetch_avatar": True,
-    #                     "avatar_expires": False,
-    #                 },
-    #             ],
-    #         }
-    #     ],
-    #     "additional_data": {
-    #         "after": "c-next",
-    #     },
-    # }
 
     sender = body["sender"]
     conversations_limit = body.get("conversations_limit")
@@ -181,10 +147,8 @@ async def get_conversations_route():
 
     body["function"] = "getConversations"
     body["routing_key"] = body["sender"]
-    # body["conversations_limit"] = body.get("conversations_limit", 30)
-    # body["messages_limit"] = body.get("messages_limit", 30)
-    body["conversations_limit"] = 1
-    body["messages_limit"] = 1
+    body["conversations_limit"] = body.get("conversations_limit", 30)
+    body["messages_limit"] = body.get("messages_limit", 30)
 
     _rpc_client = await rpc_client.connect()
     response = await _rpc_client.post_message_to_server(body)
