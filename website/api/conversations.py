@@ -148,7 +148,7 @@ async def get_conversations_route():
 
     body["function"] = "getConversations"
     body["routing_key"] = body["sender"]
-    body["conversations_limit"] = 14 #body.get("conversations_limit", 30)
+    body["conversations_limit"] = 29 #body.get("conversations_limit", 30)
     body["messages_limit"] = body.get("messages_limit", 30)
 
     _rpc_client = await rpc_client.connect()
