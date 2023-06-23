@@ -123,7 +123,7 @@ async def get_conversations(body: dict):
         conversations.append(
             {
                 "id": convo_id,
-                "link": "https://google.com",
+                "link": f"https://google.com/{convo_id}",
                 "status": "open",
                 "seen": conversation.unread_messages_count == 0,
                 "next_messages_cursor": None,

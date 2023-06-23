@@ -5,7 +5,6 @@ import os
 import hypercorn
 from hypercorn.config import Config
 import hypercorn.asyncio
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from website import create_app
 from website.util import get_db, remove_session_files
