@@ -39,14 +39,14 @@ async def formatted_participants_by_convo_id(
             "id": str(conversation.id),
             "name": person_talking_to_name,
             "role": "source_user",
-            "avatar_url": 'https://gravatar.com/avatar/2eb4c1887fa17ea75944707163aebeb9?s=400&d=robohash&r=x'
+            "avatar_url": "https://gravatar.com/avatar/2eb4c1887fa17ea75944707163aebeb9?s=400&d=robohash&r=x",
         },
         {
             # us
             "id": str(me.id),
             "name": me_name,
             "role": "source_user",
-            "avatar_url": 'https://gravatar.com/avatar/2eb4c1887fa17ea75944707163aebeb9?s=400&d=robohash&r=x'
+            "avatar_url": "https://gravatar.com/avatar/2eb4c1887fa17ea75944707163aebeb9?s=400&d=robohash&r=x",
         },
     ]
 
@@ -94,15 +94,39 @@ async def get_conversation_by_id_route(body: dict):
 
 
 async def get_conversations(body: dict):
-    
     return {
         "success": True,
-        "data": [],
+        "data": {
+            "id": "dfgjhflgkjsjlgfk",
+            "link": "https://google.com",
+            "status": "open",
+            "seen": False,
+            "next_messages_cursor": None,
+            "messages": [],
+            "participants": [
+                {
+                    "id": "sender-pd-1",
+                    "name": "Pipedriver Test User",
+                    "role": "source_user",
+                    "avatar_url": "https://google.com",
+                    "fetch_avatar": False,
+                    "avatar_expires": False,
+                },
+                {
+                    "id": "Sender 2",
+                    "name": "Pipedriver Test User 2",
+                    "role": "end_user",
+                    "avatar_url": "https://google.com",
+                    "fetch_avatar": False,
+                    "avatar_expires": False,
+                },
+            ],
+        },
         "additional_data": {
             "after": "c-next",
         },
     }
-    
+
     sender = body["sender"]
     conversations_limit = body.get("conversations_limit")
     messages_limit = body.get("messages_limit")
@@ -135,8 +159,6 @@ async def get_conversations(body: dict):
                 "participants": participants,
             }
         )
-
-    
 
 
 @conversations_route.route("/getConversations")
