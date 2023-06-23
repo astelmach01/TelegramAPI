@@ -86,7 +86,8 @@ async def get_conversation_by_id(body: dict):
 
 
 @conversations_route.route("/getConversationById")
-async def get_conversation_by_id_route(body: dict):
+async def get_conversation_by_id_route():
+    body = await request.get_json()
     body["function"] = "getConversationById"
     body["routing_key"] = body["sender"]
 
@@ -147,7 +148,7 @@ async def get_conversations_route():
 
     body["function"] = "getConversations"
     body["routing_key"] = body["sender"]
-    body["conversations_limit"] = 5 #body.get("conversations_limit", 30)
+    body["conversations_limit"] = 10 #body.get("conversations_limit", 30)
     body["messages_limit"] = body.get("messages_limit", 30)
 
     _rpc_client = await rpc_client.connect()
