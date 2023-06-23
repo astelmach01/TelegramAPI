@@ -57,6 +57,8 @@ class Client(BaseClient):
 
         future: asyncio.Future = self.futures.pop(message.correlation_id)
         future.set_result(message.body)
+        
+        await message.ack()
 
     async def post_message_to_server(self, body: dict) -> dict:
         correlation_id = str(uuid.uuid4())
