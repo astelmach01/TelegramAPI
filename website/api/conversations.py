@@ -36,7 +36,7 @@ async def formatted_participants_by_convo_id(client: Client, conversation_id: st
             # the user we are talking to
             "id": str(conversation.id),
             "name": person_talking_to_name,
-            "role": "source_user",
+            "role": "end_user",
         },
         {
             # us
