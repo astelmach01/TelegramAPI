@@ -77,7 +77,7 @@ async def get_conversation_by_id(body: dict):
             "next_messages_cursor": None,
             "messages": messages,
             "participants": participants,
-            "link": f"https://google.com",
+            "link": f"https://google.com/{conversation_id}",
         },
         "additional_data": {
             "after": "c-next",
