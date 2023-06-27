@@ -1,6 +1,7 @@
-# This README has not been updated, don't follow this
-## Telegram Plugin
 
+## Telegram API
+
+This API manages all of the GET and POST requests you would need with Telegram related services.
 
 #### Install
 
@@ -38,37 +39,10 @@ https://telegram-crm-plugin.herokuapp.com/
 
 3) Enter the rest of the associated information from telegram and pipedrive.
 
-4) When you submit, you should get an auth code from Telegram to input into the field.
+4) When you submit, you should get an auth code from Telegram to input into the field. (This will happen once twice since I still need to ditch the second client)
 
 5) You will be redirected to an OAuth page that will connect the plugin to Pipedrive, accept it.
 
 6) Enter a random channel id (it doesn't matter), leave ```provider type``` as other, and enter a channel name you'd like.
 
 7) All done, send a message from Telegram to anybody (could be yourself), and refresh the pipedrive page.
-
-- Currently only one person can use it at a time, to allow another person to use it, visit this link: 
-https://telegram-crm-plugin.herokuapp.com/logout
-
-
-
-
-<br>
-<br>
-<br>
-
-#### WhatsAPP Tutorial That I followed
-
-Follow this tutorial: https://developers.pipedrive.com/tutorials/building-messaging-app-integration-with-pipedrive?step=4
-
-
-### Legit Asyncio God (last example)
-https://www.cloudkp.com/2023/02/how-to-run-telethon-in-flask-site.html
-
-
-### Solid Login Telegram Guide
-https://stackoverflow.com/questions/71306092/how-to-login-manually-to-telegram-account-with-pyrogram-without-interactive-cons
-
-
-### Message driven architecturee q
-
-https://softwareengineering.stackexchange.com/questions/377021/message-queues-and-multiple-subscribers

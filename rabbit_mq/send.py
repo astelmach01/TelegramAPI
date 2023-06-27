@@ -79,8 +79,13 @@ class Client(BaseClient):
         )
         logging.info(f"Client published message {body} to server, awaiting response")
 
-        # wait for a max of 10 seconds for a response
-        res = await asyncio.wait_for(future, timeout=10)
+        # wait for a max of 30 seconds for a response
+        try:
+            res = await asyncio.wait_for(future, timeout=25)
+        except (asyncio.TimeoutError, asyncio.CancelledError):
+            logging.info(f"Client timed out waiting for response from server")
+            return {"success": False, "error": "timeout"}
+            
         logging.info(f"Client received response {res} from server")
         return json.loads(res.decode())
 
