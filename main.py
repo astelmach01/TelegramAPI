@@ -18,12 +18,6 @@ app = create_app()
 conn = get_db()
 
 
-async def print_manager_stats():
-    while True:
-        await asyncio.sleep(5 * 60)
-        await manager.report()
-
-
 async def start():
     logging.info("Starting server")
 
@@ -53,8 +47,6 @@ async def start():
 
         for task in backround_tasks:
             task.cancel()
-
-    app.add_background_task(print_manager_stats)
 
     config = Config()
     port = os.getenv("PORT", 8080)
