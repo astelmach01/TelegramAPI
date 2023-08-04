@@ -1,5 +1,5 @@
 
-## Telegram API
+## Telegram API (currently not maintained and not up)
 
 This API manages all of the GET and POST requests you would need with Telegram related services.
 
